@@ -1,19 +1,25 @@
-import React, { ReactNode } from "react";
-import { Route, Routes } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+
+import { useAuthStore } from '@/store/useAuthStore';
+
+import { ROUTES } from '@/constants/routes';
 
 interface IProp {
-  path: string;
-  component: ReactNode;
+  children: ReactNode;
 }
 
-const DefaultLayout = ({path, component}: IProp) => {
-  return (
-    <React.Fragment>
-      <Routes>
-        <Route path={path} element={component} />
-      </Routes>
-    </React.Fragment>
-  );
-}
+const DefaultLayout = ({ children }: IProp) => {
+  const { auth } = useAuthStore();
+  const navigate = useNavigate();
 
-export { DefaultLayout };
+  useEffect(() => {
+    if (auth.isAuthenticated()) {
+      navigate(ROUTES.home);
+    }
+  }, [auth, navigate]);
+
+  return <>{children}</>;
+};
+
+export default DefaultLayout;
