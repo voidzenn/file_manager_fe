@@ -1,24 +1,19 @@
 import { create } from "zustand";
 
-import { signinRequest } from '@/apis/authRequest';
+import { ISigninRequest, signinRequest } from '@/apis/authRequest';
 import { getAuthTokenCookie, getAuthUserCookie, setAuthTokenCookie, setAuthUserCookie } from "@/lib/cookie";
 
-interface ISignin {
-  email: string | '';
-  password: string | '';
+interface IAuth {
   data: [] | null;
   loading: boolean;
   error: boolean;
   errorMessage: string | null;
-  signin: {
-    setEmail: (email: string) => void;
-    setPassword: (password: string) => void;
-    setErrorMessage: (message: string | null) => void;
-  };
+  initializeErrorMessage: () => void;
   auth: {
     isAuthenticated: () => boolean;
-  }
-  signinRequest: () => void;
+  };
+  signin: (nil: ISigninRequest) => void;
+  signup: () => void;
 }
 
 interface IToken {
@@ -41,28 +36,20 @@ interface ISigninErrorResponse {
   };
 }
 
-export const useAuthStore = create<ISignin>((set, getState) => {
-
-  const signin = {
-    setEmail: (email: string) => set({ email: email }),
-    setPassword: (password: string) => set({ password: password }),
-    setErrorMessage: (message: string | null) => set({ errorMessage: message }),
-  };
-
+export const useAuthStore = create<IAuth>((set) => {
   const auth = {
     isAuthenticated: () => false,
   };
 
-  const initialState: ISignin = {
-    email: '',
-    password: '',
+  const initialState: IAuth = {
     data: null,
     loading: false,
     error: false,
     errorMessage: '',
-    signin,
+    initializeErrorMessage: () => set({ errorMessage: '' }),
     auth,
-    signinRequest: () => null,
+    signin: () => null,
+    signup: () => null,
   };
 
   const handleCookie = ({ email, fname, lname, meta }: ISigninResponse) => {
@@ -82,22 +69,14 @@ export const useAuthStore = create<ISignin>((set, getState) => {
     auth: {
       isAuthenticated: () => {
         return getAuthTokenCookie() && getAuthUserCookie();
-      }
+      },
     },
 
-    signinRequest: async () => {
-      const email = getState().email;
-      const password = getState().password;
-
+    signin: async (data: ISigninRequest) => {
       try {
         set({ loading: true });
 
-        const request = await signinRequest({
-          data: {
-            email: email,
-            password: password,
-          },
-        });
+        const request = await signinRequest(data);
 
         handleCookie(request.data.data);
 
@@ -108,6 +87,10 @@ export const useAuthStore = create<ISignin>((set, getState) => {
 
         set({ errorMessage: responseData.error, loading: false });
       }
+    },
+
+    signupRequest: async () => {
+      return 'test';
     },
   };
 });
