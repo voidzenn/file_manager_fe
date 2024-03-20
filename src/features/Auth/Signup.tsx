@@ -49,14 +49,14 @@ const Signup = () => {
   return (
     <React.Fragment>
       <div className="flex justify-center min-h-screen min-w-full mx-auto my-auto items-center align-middle">
-        <Card className="px-12 pb-5 mb-12 w-[1000px] h-auto">
+        <Card className="px-12 pb-5 mb-10 w-[1000px] h-auto">
           <CardTitle className="mt-10 mb-10 text-center">
             Create Account
           </CardTitle>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <CardContent className="mb-12">
-                <div className="flex gap-8 mb-10">
+              <CardContent className="mb-5">
+                <div className="flex gap-8 mb-5">
                   <div className="w-1/2">
                     <FormField
                       control={form.control}
@@ -67,7 +67,9 @@ const Signup = () => {
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <div className="min-h-5">
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
@@ -82,13 +84,15 @@ const Signup = () => {
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <div className="min-h-5">
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
                   </div>
                 </div>
-                <div className="flex gap-8 mb-10">
+                <div className="flex gap-8 mb-5">
                   <div className="w-1/2">
                     <FormField
                       control={form.control}
@@ -99,7 +103,9 @@ const Signup = () => {
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <div className="min-h-5">
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
@@ -117,7 +123,9 @@ const Signup = () => {
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <div className="min-h-5">
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
@@ -132,7 +140,9 @@ const Signup = () => {
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
-                          <FormMessage />
+                          <div className="min-h-5">
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
