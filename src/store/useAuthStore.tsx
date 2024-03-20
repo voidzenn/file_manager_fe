@@ -1,39 +1,34 @@
 import { create } from "zustand";
 
-import { ISigninRequest, signinRequest } from '@/apis/authRequest';
-import { getAuthTokenCookie, getAuthUserCookie, setAuthTokenCookie, setAuthUserCookie } from "@/lib/cookie";
+import {
+  ISigninErrorResponse,
+  ISigninRequest,
+  ISigninResponse,
+  ISignupErrorResponse,
+  ISignupRequest,
+} from '@/apis/auth/authInterface';
+import { signinRequest, signupRequest } from "@/apis/auth/authRequest";
+import {
+  getAuthTokenCookie,
+  getAuthUserCookie,
+  setAuthTokenCookie,
+  setAuthUserCookie,
+} from '@/lib/cookie';
+
 
 interface IAuth {
   data: [] | null;
   loading: boolean;
+  success: boolean;
+  successMessage: string;
   error: boolean;
-  errorMessage: string | null;
+  errorMessage: string | Array<unknown>;
   initializeErrorMessage: () => void;
   auth: {
     isAuthenticated: () => boolean;
   };
   signin: (nil: ISigninRequest) => void;
-  signup: () => void;
-}
-
-interface IToken {
-  token: string;
-}
-
-interface ISigninResponse {
-  email: string | null;
-  fname: string | null;
-  lname: string | null;
-  meta: IToken;
-}
-
-interface ISigninErrorResponse {
-  response: {
-    data: {
-      error: string | null;
-      success: boolean;
-    };
-  };
+  signup: (nil: ISignupRequest) => void;
 }
 
 export const useAuthStore = create<IAuth>((set) => {
@@ -44,6 +39,8 @@ export const useAuthStore = create<IAuth>((set) => {
   const initialState: IAuth = {
     data: null,
     loading: false,
+    success: false,
+    successMessage: '',
     error: false,
     errorMessage: '',
     initializeErrorMessage: () => set({ errorMessage: '' }),
@@ -76,21 +73,33 @@ export const useAuthStore = create<IAuth>((set) => {
       try {
         set({ loading: true });
 
-        const request = await signinRequest(data);
+        const requestData = await signinRequest(data);
 
-        handleCookie(request.data.data);
+        handleCookie(requestData);
 
         set({ loading: false });
       } catch (error: unknown) {
         const errorResponse = error as ISigninErrorResponse;
-        const responseData = errorResponse.response.data;
+        const errorMessage = errorResponse.response.data.error as Array<unknown>;
 
-        set({ errorMessage: responseData.error, loading: false });
+        set({ errorMessage: errorMessage, loading: false });
       }
     },
 
-    signupRequest: async () => {
-      return 'test';
+    signup: async (data: ISignupRequest) => {
+      try {
+        set({ loading: true });
+
+        const requestData = await signupRequest(data);
+
+        set({ loading: false });
+        set({ successMessage: requestData.response.data.message })
+      } catch (error: unknown) {
+        const errorResponse = error as ISignupErrorResponse;
+        const errorMessage = errorResponse.response.data.error as Array<unknown>;
+
+        set({ errorMessage: errorMessage, loading: false });
+      }
     },
   };
 });
