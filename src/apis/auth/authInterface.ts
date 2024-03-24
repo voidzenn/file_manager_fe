@@ -25,7 +25,7 @@ export interface ISigninResponse {
   meta: IToken;
 }
 
-export interface ISigninErrorResponse extends IErrorResponse {}
+export interface ISigninErrorResponse extends IErrorResponse{}
 
 export interface ISignupRequest {
   user: {
@@ -45,4 +45,14 @@ export interface ISignupResponse {
   };
 }
 
-export interface ISignupErrorResponse extends IErrorResponse {}
+export interface ISignupErrorResponseData {
+  fname: string | null;
+  lname: string | null;
+  email: string | null;
+  password: string | null;
+}
+
+export interface ISignupErrorResponse {
+  error: [ISignupErrorResponseData] | string;
+  success: boolean;
+}

@@ -21,13 +21,18 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ToastAction } from '@radix-ui/react-toast';
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import toastConstant from '@/constants/components/ui/toastConstant';
+import { TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
 import { ROUTES } from '@/constants/routes';
-import { Label } from '@radix-ui/react-label';
+import { ToastAction } from '@/components/ui/toast';
+import { Label } from '@/components/ui/label';
+
+const SigninSchema = z.object({
+  email: string(),
+  password: string(),
+});
 
 const Signin = () => {
   const [disableSubmit, setDisableSubmit] = useState(true);
@@ -40,11 +45,6 @@ const Signin = () => {
     signin,
     auth
   } = useAuthStore();
-
-  const SigninSchema = z.object({
-    email: string(),
-    password: string()
-  })
 
   const form = useForm<z.infer<typeof SigninSchema>>({
     resolver: zodResolver(SigninSchema),
@@ -75,9 +75,9 @@ const Signin = () => {
   useEffect(() => {
     if(errorMessage) {
       toast({
-        variant: toastConstant.VARIANT_DESTRUCTIVE,
-        title: errorMessage,
-        action: <ToastAction altText="close">Close</ToastAction>
+        variant: TOAST_VARIANT_DESTRUCTIVE,
+        title: String(errorMessage),
+        action: <ToastAction altText="close">Close</ToastAction>,
       });
     }
   }, [errorMessage, toast]);

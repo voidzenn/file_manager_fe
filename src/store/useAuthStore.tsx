@@ -1,10 +1,12 @@
 import { create } from "zustand";
+import { AxiosError, AxiosResponse } from 'axios';
 
 import {
   ISigninErrorResponse,
   ISigninRequest,
   ISigninResponse,
   ISignupErrorResponse,
+  ISignupErrorResponseData,
   ISignupRequest,
 } from '@/apis/auth/authInterface';
 import { signinRequest, signupRequest } from "@/apis/auth/authRequest";
@@ -15,20 +17,25 @@ import {
   setAuthUserCookie,
 } from '@/lib/cookie';
 
-
 interface IAuth {
-  data: [] | null;
   loading: boolean;
   success: boolean;
   successMessage: string;
-  error: boolean;
-  errorMessage: string | Array<unknown>;
+  error: unknown;
+  errorMessage: string;
   initializeErrorMessage: () => void;
   auth: {
     isAuthenticated: () => boolean;
   };
   signin: (nil: ISigninRequest) => void;
-  signup: (nil: ISignupRequest) => void;
+  signup: {
+    error: ISignupErrorResponseData;
+    errorMessage: string;
+    success: boolean;
+    successMessage: string;
+    initializeErrorMessage: () => void;
+    request: (nil: ISignupRequest) => void;
+  };
 }
 
 export const useAuthStore = create<IAuth>((set) => {
@@ -37,16 +44,28 @@ export const useAuthStore = create<IAuth>((set) => {
   };
 
   const initialState: IAuth = {
-    data: null,
     loading: false,
     success: false,
     successMessage: '',
-    error: false,
+    error: [],
     errorMessage: '',
-    initializeErrorMessage: () => set({ errorMessage: '' }),
+    initializeErrorMessage: () =>
+      set((state) => ({ ...state, signup: { ...state.signup, errorMessage: '' } })),
     auth,
     signin: () => null,
-    signup: () => null,
+    signup: {
+      success: false,
+      successMessage: '',
+      error: {
+        fname: '',
+        lname: '',
+        email: '',
+        password: '',
+      },
+      errorMessage: '',
+      initializeErrorMessage: () => null,
+      request: () => null,
+    },
   };
 
   const handleCookie = ({ email, fname, lname, meta }: ISigninResponse) => {
@@ -80,26 +99,58 @@ export const useAuthStore = create<IAuth>((set) => {
         set({ loading: false });
       } catch (error: unknown) {
         const errorResponse = error as ISigninErrorResponse;
-        const errorMessage = errorResponse.response.data.error as Array<unknown>;
+        const errorMessage = errorResponse.response.data
+          .error as Array<unknown>;
 
         set({ errorMessage: errorMessage, loading: false });
       }
     },
 
-    signup: async (data: ISignupRequest) => {
-      try {
-        set({ loading: true });
+    signup: {
+      initializeErrorMessage: () =>
+        set((state) => ({
+          ...state,
+          signup: { ...state.signup, errorMessage: '' },
+        })),
 
-        const requestData = await signupRequest(data);
+      request: async (data: ISignupRequest) => {
+        const requestData = await signupRequest(data)
+          .then(() => {
+            set({ loading: true });
+            set({ loading: false });
+            set({ successMessage: requestData.response.data.message });
+          })
+          .catch((error: unknown) => {
+            const errorResponse = error as AxiosError;
+            const signupError = errorResponse.response
+              ?.data as ISignupErrorResponse;
 
-        set({ loading: false });
-        set({ successMessage: requestData.response.data.message })
-      } catch (error: unknown) {
-        const errorResponse = error as ISignupErrorResponse;
-        const errorMessage = errorResponse.response.data.error as Array<unknown>;
+            if (new String(signupError.error) instanceof String) {
+              console.log(signupError.error);
 
-        set({ errorMessage: errorMessage, loading: false });
-      }
+              set((state) => ({
+                ...state,
+                signup: {
+                  ...state.signup,
+                  errorMessage: String(signupError.error),
+                  loading: false,
+                },
+              }));
+            } else {
+              const errorData = signupError
+                .error[0] as ISignupErrorResponseData;
+
+              set((state) => ({
+                ...state,
+                signup: {
+                  ...state.signup,
+                  error: errorData,
+                },
+                loading: false,
+              }));
+            }
+          });
+      },
     },
   };
 });

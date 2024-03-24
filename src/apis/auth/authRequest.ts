@@ -1,6 +1,10 @@
-import { SIGNIN_API, SIGNUP_API } from "@/constants/apis";
+import { SIGNIN_API, SIGNUP_API } from '@/constants/apis';
 import axiosConfig from '@/apis/axiosConfig';
-import { ISigninRequest, ISigninResponse, ISignupRequest, ISignupResponse } from "@/apis/auth/authInterface";
+import {
+  ISigninRequest,
+  ISigninResponse,
+  ISignupRequest,
+} from '@/apis/auth/authInterface';
 
 export const signinRequest = async ({ data }: ISigninRequest) => {
   return await axiosConfig.post(SIGNIN_API, data).then(({ data }) => {
@@ -9,7 +13,5 @@ export const signinRequest = async ({ data }: ISigninRequest) => {
 };
 
 export const signupRequest = async (userData: ISignupRequest) => {
-  return await axiosConfig.post(SIGNUP_API, userData).then(({ data }) => {
-    return data.data as ISignupResponse;
-  });
+  return await axiosConfig.post(SIGNUP_API, userData);
 };
