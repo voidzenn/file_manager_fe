@@ -1,3 +1,2 @@
-const VARIANT_DESTRUCTIVE: "destructive" | "default" | null | undefined = 'destructive';
-
-export default { VARIANT_DESTRUCTIVE };
+export const TOAST_VARIANT_DEFAULT = 'default';
+export const TOAST_VARIANT_DESTRUCTIVE = 'destructive';

@@ -1,0 +1,2 @@
+export const SHORT_DELAY_TIME = 3000;
+export const FIVE_SECOND_DELAY_TIME = 5000

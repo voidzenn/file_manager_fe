@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { string, z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/components/ui/use-toast';
 
 import { Button } from '@/components/ui/button';
@@ -10,108 +13,158 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@radix-ui/react-label';
-import { ToastAction } from '@radix-ui/react-toast';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import toastConstant from '@/constants/components/ui/toastConstant';
+import { TOAST_VARIANT_DEFAULT, TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
 import { ROUTES } from '@/constants/routes';
+import { Label } from '@/components/ui/label';
+import { SHORT_DELAY_TIME } from '@/constants/timer';
+
+const SigninSchema = z.object({
+  email: string(),
+  password: string(),
+});
 
 const Signin = () => {
-  const [enableSubmit, setEnableSubmit] = useState(false);
+  const [disableSubmit, setDisableSubmit] = useState(true);
   const navigate = useNavigate();
-
   const { toast } = useToast();
 
   const {
-    email,
-    password,
-    errorMessage,
-    signin: { setEmail, setPassword, setErrorMessage },
-    signinRequest,
+    signin,
     auth
   } = useAuthStore();
 
-  useEffect(() => {
-    if (email && password) {
-      setEnableSubmit(true);
-    } else {
-      enableSubmit && setEnableSubmit(false);
+  const form = useForm<z.infer<typeof SigninSchema>>({
+    resolver: zodResolver(SigninSchema),
+    defaultValues: {
+      email: '',
+      password: ''
     }
-  }, [email, password, enableSubmit]);
+  });
+  const formWatch = form.watch();
+
+  const onSubmit = async (values: z.infer<typeof SigninSchema>) => {
+    signin.initializeState();
+
+    await signin.request({
+      data: {
+        email: values.email,
+        password: values.password
+      }
+    });
+  }
 
   useEffect(() => {
-    if(errorMessage) {
+    if (
+      signin.success &&
+      signin.successMessage !== '' &&
+      auth.isAuthenticated()
+    ) {
+      const timeout = setTimeout(() => {
+        signin.initializeState();
+        navigate(ROUTES.home);
+      }, 500000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [signin, navigate, auth]);
+
+  useEffect(() => {
+    if (signin.errorMessage) {
       toast({
-        variant: toastConstant.VARIANT_DESTRUCTIVE,
-        title: errorMessage,
-        action: <ToastAction altText="close">Close</ToastAction>
+        variant: TOAST_VARIANT_DESTRUCTIVE,
+        title: signin.errorMessage,
       });
     }
-  }, [errorMessage, toast, setErrorMessage]);
+  }, [signin.errorMessage, toast]);
 
   useEffect(() => {
-    if (auth.isAuthenticated()) {
-      navigate(ROUTES.home);
+    if (signin.success) {
+      toast({
+        variant: TOAST_VARIANT_DEFAULT,
+        title: signin.successMessage,
+        duration: SHORT_DELAY_TIME
+      });
     }
-  }, [auth, navigate])
+  }, [signin.success, signin.successMessage, toast]);
 
-  const handleEmail = (e: React.FormEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-
-    setEmail(target.value);
-    errorMessage && setErrorMessage(null);
-  };
-
-  const handlePassword = (e: React.FormEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-
-    setPassword(target.value);
-    errorMessage && setErrorMessage(null);
-  };
-
-  const handleSignin = async () => {
-    await signinRequest();
-  };
+  useEffect(() => {
+    if (formWatch.email.length > 0 && formWatch.password.length > 0) {
+      setDisableSubmit(false);
+    } else {
+      !disableSubmit && setDisableSubmit(true);
+    }
+  }, [form, formWatch, disableSubmit, setDisableSubmit]);
 
   return (
-    <>
-      <div className="flex justify-center min-h-screen min-w-full mx-auto my-auto items-center align-middle">
-        <Card className="px-12" title="test">
-          <CardTitle className="mt-10 mb-10 text-center">
-            File Manager
-          </CardTitle>
-          <CardContent>
-            <div className="mt-5">
-              <Label>Email</Label>
-              <Input className="mt-2" onChange={handleEmail} />
-            </div>
-            <div className="mt-5">
-              <Label>Password</Label>
-              <Input className="mt-2" onChange={handlePassword} />
-            </div>
-          </CardContent>
-          <CardFooter className="flex-col">
-            <Button
-              className="justify-center mx-auto"
-              onClick={handleSignin}
-              disabled={!enableSubmit}
-            >
-              Sign In
-            </Button>
-            <Label className="mt-5">
-              Don't have an account?
-              <Button variant="link" className="m-0 p-0 pl-1" onClick={() => {
-                navigate('/signup');
-              }}>
-                Sign Up
+    <div className="flex justify-center min-h-screen min-w-full mx-auto my-auto items-center align-middle">
+      <Card className="px-12" title="test">
+        <CardTitle className="mt-10 mb-10 text-center">File Manager</CardTitle>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <div className="min-h-5">
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="password" />
+                    </FormControl>
+                    <div className="min-h-5">
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            <CardFooter className="flex-col">
+              <Button type="submit" disabled={disableSubmit}>
+                Signin
               </Button>
-            </Label>
-          </CardFooter>
-        </Card>
-      </div>
-    </>
+              <Label className="mt-6 text-sm">
+                Don't have an account?
+                <Button
+                  variant="link"
+                  className="m-0 p-0 pl-2 text-sm"
+                  onClick={() => {
+                    navigate(ROUTES.signup);
+                  }}
+                >
+                  Signup
+                </Button>
+              </Label>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
+    </div>
   );
 };
 
