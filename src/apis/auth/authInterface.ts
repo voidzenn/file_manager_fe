@@ -2,15 +2,6 @@ interface IToken {
   token: string;
 }
 
-interface IErrorResponse {
-  response: {
-    data: {
-      error: string | Array<unknown> | null;
-      success: boolean;
-    };
-  };
-}
-
 export interface ISigninRequest {
   data: {
     email: string;
@@ -25,7 +16,10 @@ export interface ISigninResponse {
   meta: IToken;
 }
 
-export interface ISigninErrorResponse extends IErrorResponse{}
+export interface ISigninErrorResponse {
+  success: boolean;
+  error: string;
+}
 
 export interface ISignupRequest {
   user: {

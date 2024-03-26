@@ -24,10 +24,10 @@ import {
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import { TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
+import { TOAST_VARIANT_DEFAULT, TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
 import { ROUTES } from '@/constants/routes';
-import { ToastAction } from '@/components/ui/toast';
 import { Label } from '@/components/ui/label';
+import { SHORT_DELAY_TIME } from '@/constants/timer';
 
 const SigninSchema = z.object({
   email: string(),
@@ -40,8 +40,6 @@ const Signin = () => {
   const { toast } = useToast();
 
   const {
-    errorMessage,
-    initializeErrorMessage,
     signin,
     auth
   } = useAuthStore();
@@ -56,9 +54,9 @@ const Signin = () => {
   const formWatch = form.watch();
 
   const onSubmit = async (values: z.infer<typeof SigninSchema>) => {
-    initializeErrorMessage();
+    signin.initializeState();
 
-    await signin({
+    await signin.request({
       data: {
         email: values.email,
         password: values.password
@@ -67,20 +65,38 @@ const Signin = () => {
   }
 
   useEffect(() => {
-    if (auth.isAuthenticated()) {
-      navigate(ROUTES.home);
+    if (
+      signin.success &&
+      signin.successMessage !== '' &&
+      auth.isAuthenticated()
+    ) {
+      const timeout = setTimeout(() => {
+        signin.initializeState();
+        navigate(ROUTES.home);
+      }, 500000);
+
+      return () => clearTimeout(timeout);
     }
-  }, [auth, navigate]);
+  }, [signin, navigate, auth]);
 
   useEffect(() => {
-    if(errorMessage) {
+    if (signin.errorMessage) {
       toast({
         variant: TOAST_VARIANT_DESTRUCTIVE,
-        title: String(errorMessage),
-        action: <ToastAction altText="close">Close</ToastAction>,
+        title: signin.errorMessage,
       });
     }
-  }, [errorMessage, toast]);
+  }, [signin.errorMessage, toast]);
+
+  useEffect(() => {
+    if (signin.success) {
+      toast({
+        variant: TOAST_VARIANT_DEFAULT,
+        title: signin.successMessage,
+        duration: SHORT_DELAY_TIME
+      });
+    }
+  }, [signin.success, signin.successMessage, toast]);
 
   useEffect(() => {
     if (formWatch.email.length > 0 && formWatch.password.length > 0) {
@@ -119,7 +135,7 @@ const Signin = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} type="password" />
                     </FormControl>
                     <div className="min-h-5">
                       <FormMessage />

@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { string, z } from 'zod';
+import { useTimeout } from 'usehooks-ts';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
@@ -13,12 +15,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-
-import { useAuthStore } from '@/store/useAuthStore';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
-import { TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
-import { ERROR_RESPONSE_MESSAGE } from '@/constants/components/reponseMessage';
+
+import { useAuthStore } from '@/store/useAuthStore';
+import { TOAST_VARIANT_DEFAULT, TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
+import { SIGNUP_ERROR_RESPONSE_MESSAGE } from '@/constants/reponseMessage';
+import { SHORT_DELAY_TIME } from '@/constants/timer';
+import { ROUTES } from '@/constants/routes';
 
 const SignupSchema = z
   .object({
@@ -41,7 +45,8 @@ const SignupSchema = z
   });
 
 const Signup = () => {
-  const { signup } = useAuthStore();
+  const { signup, loading } = useAuthStore();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof SignupSchema>>({
     resolver: zodResolver(SignupSchema),
@@ -56,7 +61,7 @@ const Signup = () => {
   const validForm = Object.keys(form.formState.errors).length === 0;
 
   const onSubmit = async (values: z.infer<typeof SignupSchema>) => {
-    signup.initializeErrorMessage();
+    signup.initializeState();
 
     await signup.request({
       user: {
@@ -72,15 +77,32 @@ const Signup = () => {
     if(signup.errorMessage) {
       toast({
         variant: TOAST_VARIANT_DESTRUCTIVE,
-        title: ERROR_RESPONSE_MESSAGE,
+        title: SIGNUP_ERROR_RESPONSE_MESSAGE,
       });
     }
   }, [signup.errorMessage])
 
+  useEffect(() => {
+    if (signup.success) {
+      toast({
+        variant: TOAST_VARIANT_DEFAULT,
+        title: signup.successMessage,
+        duration: SHORT_DELAY_TIME,
+      });
+    }
+  }, [signup.success, signup.successMessage, navigate]);
+
+  useTimeout(() => {
+    if (signup.success) {
+      signup.initializeState();
+      navigate(ROUTES.signin);
+    }
+  }, SHORT_DELAY_TIME);
+
   return (
     <React.Fragment>
       <div className="flex justify-center min-h-screen min-w-full mx-auto my-auto items-center align-middle">
-        <Card className="px-12 pb-5 mb-10 w-[1000px] h-auto">
+        <Card className="px-12 pb-5 w-[1000px] h-auto">
           <CardTitle className="mt-10 mb-10 text-center">
             Create Account
           </CardTitle>
@@ -158,7 +180,11 @@ const Signup = () => {
                         <FormItem>
                           <Label>Password</Label>
                           <FormControl>
-                            <Input {...field} />
+                            <Input
+                              {...field}
+                              autoComplete="false"
+                              type="password"
+                            />
                           </FormControl>
                           <div className="min-h-5">
                             <FormMessage className="first-letter:uppercase">
@@ -177,7 +203,11 @@ const Signup = () => {
                         <FormItem>
                           <Label>Confirm Password</Label>
                           <FormControl>
-                            <Input {...field} />
+                            <Input
+                              {...field}
+                              autoComplete="off"
+                              type="password"
+                            />
                           </FormControl>
                           <div className="min-h-5">
                             <FormMessage />
@@ -188,10 +218,23 @@ const Signup = () => {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="w-full flex item-middle justify-center">
-                <Button type="submit" disabled={!validForm}>
+              <CardFooter className="w-full flex flex-col">
+                <Button type="submit" disabled={!validForm || loading}>
                   Signup
                 </Button>
+                <div className="mt-8">
+                  <Label>Already have account?</Label>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="m-0 p-0 pl-2 text-sm"
+                    onClick={() => {
+                      navigate(ROUTES.signin);
+                    }}
+                  >
+                    Signin
+                  </Button>
+                </div>
               </CardFooter>
             </form>
           </Form>

@@ -32,6 +32,7 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "universal-cookie": "^7.1.0",
+    "usehooks-ts": "^3.0.2",
     "yarn": "^1.22.21",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"

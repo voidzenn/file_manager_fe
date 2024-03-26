@@ -16,24 +16,26 @@ import {
   setAuthTokenCookie,
   setAuthUserCookie,
 } from '@/lib/cookie';
+import { SIGNIN_SUCCESS_RESPONSE_MESSAGE, SIGNUP_SUCCESS_RESPONSE_MESSAGE } from "@/constants/reponseMessage";
 
 interface IAuth {
   loading: boolean;
-  success: boolean;
-  successMessage: string;
-  error: unknown;
-  errorMessage: string;
-  initializeErrorMessage: () => void;
   auth: {
     isAuthenticated: () => boolean;
   };
-  signin: (nil: ISigninRequest) => void;
+  signin: {
+    errorMessage: string;
+    success: boolean;
+    successMessage: string;
+    initializeState: () => void;
+    request: (nil: ISigninRequest) => void;
+  };
   signup: {
     error: ISignupErrorResponseData;
     errorMessage: string;
     success: boolean;
     successMessage: string;
-    initializeErrorMessage: () => void;
+    initializeState: () => void;
     request: (nil: ISignupRequest) => void;
   };
 }
@@ -45,14 +47,14 @@ export const useAuthStore = create<IAuth>((set) => {
 
   const initialState: IAuth = {
     loading: false,
-    success: false,
-    successMessage: '',
-    error: [],
-    errorMessage: '',
-    initializeErrorMessage: () =>
-      set((state) => ({ ...state, signup: { ...state.signup, errorMessage: '' } })),
     auth,
-    signin: () => null,
+    signin: {
+      success: false,
+      successMessage: '',
+      errorMessage: '',
+      initializeState:() => null,
+      request: () => null,
+    },
     signup: {
       success: false,
       successMessage: '',
@@ -63,7 +65,7 @@ export const useAuthStore = create<IAuth>((set) => {
         password: '',
       },
       errorMessage: '',
-      initializeErrorMessage: () => null,
+      initializeState: () => null,
       request: () => null,
     },
   };
@@ -88,46 +90,89 @@ export const useAuthStore = create<IAuth>((set) => {
       },
     },
 
-    signin: async (data: ISigninRequest) => {
-      try {
+    signin: {
+      initializeState: () => {
+        set((state) => ({
+          ...state,
+          signin: {
+            ...state.signin,
+            ...initialState
+          },
+        }));
+      },
+
+      request: async (data: ISigninRequest) => {
         set({ loading: true });
 
-        const requestData = await signinRequest(data);
+        await signinRequest(data)
+          .then((data: AxiosResponse) => {
+            const response = data.data;
+            const successData = response.data as ISigninResponse;
+            const successMessage = SIGNIN_SUCCESS_RESPONSE_MESSAGE;
 
-        handleCookie(requestData);
+            handleCookie(successData);
 
-        set({ loading: false });
-      } catch (error: unknown) {
-        const errorResponse = error as ISigninErrorResponse;
-        const errorMessage = errorResponse.response.data
-          .error as Array<unknown>;
+            set((state) => ({
+              ...state,
+              signin: {
+                ...state.signin,
+                success: true,
+                successMessage: successMessage,
+              },
+              loading: false,
+            }));
+          })
+          .catch((error: unknown) => {
+            const response = error as AxiosError;
+            const errorResponse = response.response
+              ?.data as ISigninErrorResponse;
+            const errorMessage = errorResponse?.error;
 
-        set({ errorMessage: errorMessage, loading: false });
+            set((state) => ({
+              ...state,
+              signin: { ...state.signin, errorMessage: errorMessage },
+              loading: false,
+            }));
+          });
       }
     },
 
     signup: {
-      initializeErrorMessage: () =>
+      initializeState: () =>
         set((state) => ({
           ...state,
-          signup: { ...state.signup, errorMessage: '' },
+          signup: {
+            ...state.signup,
+            errorMessage: '',
+            error: initialState.signup.error,
+            success: false,
+            successMessage: '',
+          },
         })),
 
       request: async (data: ISignupRequest) => {
-        const requestData = await signupRequest(data)
+        set({ loading: true });
+
+        await signupRequest(data)
           .then(() => {
-            set({ loading: true });
-            set({ loading: false });
-            set({ successMessage: requestData.response.data.message });
+            const successMessage = SIGNUP_SUCCESS_RESPONSE_MESSAGE;
+
+            set((state) => ({
+              ...state,
+              signup: {
+                ...state.signup,
+                success: true,
+                successMessage: successMessage,
+              },
+              loading: false,
+            }));
           })
           .catch((error: unknown) => {
             const errorResponse = error as AxiosError;
             const signupError = errorResponse.response
               ?.data as ISignupErrorResponse;
 
-            if (new String(signupError.error) instanceof String) {
-              console.log(signupError.error);
-
+            if (typeof signupError.error === 'string') {
               set((state) => ({
                 ...state,
                 signup: {
