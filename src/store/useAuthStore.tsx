@@ -5,6 +5,7 @@ import {
   ISigninErrorResponse,
   ISigninRequest,
   ISigninResponse,
+  ISigninTokens,
   ISignupErrorResponse,
   ISignupErrorResponseData,
   ISignupRequest,
@@ -70,14 +71,17 @@ export const useAuthStore = create<IAuth>((set) => {
     },
   };
 
-  const handleCookie = ({ email, fname, lname, meta }: ISigninResponse) => {
+  const handleCookie = (
+    { email, fname, lname }: ISigninResponse,
+    { token }: ISigninTokens
+  ) => {
     const userData = {
       email: email,
       fname: fname,
       lname: lname,
     };
 
-    setAuthTokenCookie(meta.token);
+    setAuthTokenCookie(token);
     setAuthUserCookie(userData);
   };
 
@@ -108,9 +112,10 @@ export const useAuthStore = create<IAuth>((set) => {
           .then((data: AxiosResponse) => {
             const response = data.data;
             const successData = response.data as ISigninResponse;
+            const metaData = response.meta as ISigninTokens;
             const successMessage = SIGNIN_SUCCESS_RESPONSE_MESSAGE;
 
-            handleCookie(successData);
+            handleCookie(successData, metaData);
 
             set((state) => ({
               ...state,

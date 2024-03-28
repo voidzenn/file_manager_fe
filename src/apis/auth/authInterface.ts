@@ -1,6 +1,3 @@
-interface IToken {
-  token: string;
-}
 
 export interface ISigninRequest {
   data: {
@@ -13,7 +10,11 @@ export interface ISigninResponse {
   email: string | null;
   fname: string | null;
   lname: string | null;
-  meta: IToken;
+}
+
+export interface ISigninTokens {
+  token: string;
+  refreshToken: string;
 }
 
 export interface ISigninErrorResponse {
