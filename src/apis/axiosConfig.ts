@@ -1,12 +1,12 @@
 import axios from "axios";
-import { ENV_CONFIG } from "@/constants/envConfig";
+import { APP } from "@/constants/app";
 
 const axiosConfig = axios.create({
-  baseURL: ENV_CONFIG.base_url,
+  baseURL: APP.baseUrl,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
-  timeout: ENV_CONFIG.request_timeout,
+  timeout: APP.requestTimeout,
 });
 
 export default axiosConfig;
