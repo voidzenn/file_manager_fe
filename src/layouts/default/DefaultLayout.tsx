@@ -21,7 +21,7 @@ const DefaultLayout = ({ children }: IProp) => {
   }, [auth, navigate]);
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex justify-between">
       {auth.isAuthenticated() && <Sidebar />}
 
       <main className="w-full h-full">{children}</main>
