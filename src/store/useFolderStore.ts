@@ -1,8 +1,12 @@
 import { create } from 'zustand';
-
-import { IFolderData, IFolderListResponse } from '@/apis/folder/folderInterface';
-import { getFolderList } from '@/apis/folder/folderRequest';
 import { AxiosResponse } from 'axios';
+
+import { getFolderList } from '@/apis/folder/folderRequest';
+import { useAuthStore } from './useAuthStore';
+import {
+  IFolderData,
+  IFolderListResponse,
+} from '@/apis/folder/folderInterface';
 
 interface IFolder {
   folders: [IFolderData] | [];
@@ -19,7 +23,9 @@ export const useFoldersStore = create<IFolder>((set) => {
     ...initialState,
 
     getFoldersList: async () => {
-      await getFolderList().then((data: AxiosResponse) => {
+      await getFolderList({
+        headers: useAuthStore.getState().auth.getHeaderToken(),
+      }).then((data: AxiosResponse) => {
         const response = data?.data as IFolderListResponse;
         const responseData = response.data;
 

@@ -13,8 +13,9 @@ export interface ISigninResponse {
 }
 
 export interface ISigninTokens {
+  // Response keys from BE
   token: string;
-  refreshToken: string;
+  refresh_token: string;
 }
 
 export interface ISigninErrorResponse {
