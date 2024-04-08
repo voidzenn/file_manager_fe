@@ -54,6 +54,12 @@ const removeAuthUserCookie = () => {
   customCookie.remove(AUTH_USER);
 };
 
+// Logout remove cookies
+const removeAllCookie = () => {
+  removeAuthTokenCookie();
+  removeAuthUserCookie();
+}
+
 export {
   setAuthTokenCookie,
   getAuthTokenCookie,
@@ -61,4 +67,5 @@ export {
   setAuthUserCookie,
   getAuthUserCookie,
   removeAuthUserCookie,
+  removeAllCookie,
 };

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 
 import { ROUTES } from '@/constants/routes';
+import Sidebar from "@/components/Sidebar";
 
 interface IProp {
   children: ReactNode;
@@ -19,7 +20,13 @@ const DefaultLayout = ({ children }: IProp) => {
     }
   }, [auth, navigate]);
 
-  return <>{children}</>;
+  return (
+    <div className="flex justify-between">
+      {auth.isAuthenticated() && <Sidebar />}
+
+      <main className="w-full h-full">{children}</main>
+    </div>
+  );
 };
 
 export default DefaultLayout;

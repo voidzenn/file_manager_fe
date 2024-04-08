@@ -5,6 +5,7 @@ import {
   ISigninErrorResponse,
   ISigninRequest,
   ISigninResponse,
+  ISigninTokens,
   ISignupErrorResponse,
   ISignupErrorResponseData,
   ISignupRequest,
@@ -21,6 +22,8 @@ import { SIGNIN_SUCCESS_RESPONSE_MESSAGE, SIGNUP_SUCCESS_RESPONSE_MESSAGE } from
 interface IAuth {
   loading: boolean;
   auth: {
+    accessToken: string | null;
+    getHeaderToken: () => void;
     isAuthenticated: () => boolean;
   };
   signin: {
@@ -42,6 +45,8 @@ interface IAuth {
 
 export const useAuthStore = create<IAuth>((set) => {
   const auth = {
+    accessToken: '',
+    getHeaderToken: () => false,
     isAuthenticated: () => false,
   };
 
@@ -70,14 +75,17 @@ export const useAuthStore = create<IAuth>((set) => {
     },
   };
 
-  const handleCookie = ({ email, fname, lname, meta }: ISigninResponse) => {
+  const handleCookie = (
+    { email, fname, lname }: ISigninResponse,
+    { token }: ISigninTokens
+  ) => {
     const userData = {
       email: email,
       fname: fname,
       lname: lname,
     };
 
-    setAuthTokenCookie(meta.token);
+    setAuthTokenCookie(token);
     setAuthUserCookie(userData);
   };
 
@@ -85,6 +93,12 @@ export const useAuthStore = create<IAuth>((set) => {
     ...initialState,
 
     auth: {
+      getHeaderToken: () => {
+        return {
+          Authorization:
+            useAuthStore.getState().auth.accessToken ?? getAuthTokenCookie(),
+        };
+      },
       isAuthenticated: () => {
         return getAuthTokenCookie() && getAuthUserCookie();
       },
@@ -108,12 +122,17 @@ export const useAuthStore = create<IAuth>((set) => {
           .then((data: AxiosResponse) => {
             const response = data.data;
             const successData = response.data as ISigninResponse;
+            const metaData = response.meta as ISigninTokens;
             const successMessage = SIGNIN_SUCCESS_RESPONSE_MESSAGE;
 
-            handleCookie(successData);
+            handleCookie(successData, metaData);
 
             set((state) => ({
               ...state,
+              auth: {
+                ...state.auth,
+                accessToken: metaData.token,
+              },
               signin: {
                 ...state.signin,
                 success: true,
