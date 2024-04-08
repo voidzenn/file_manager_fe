@@ -52,3 +52,10 @@ export interface ISignupErrorResponse {
   error: [ISignupErrorResponseData] | string;
   success: boolean;
 }
+
+export interface IRefreshTokenResponse {
+  success: boolean;
+  meta: {
+    token: string
+  }
+}

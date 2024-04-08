@@ -9,7 +9,9 @@ const FolderList = () => {
   const { folders, getFoldersList } = useFoldersStore();
 
   useEffect(() => {
-    getFoldersList();
+    return () => {
+      getFoldersList();
+    }
   }, []);
 
   return (
