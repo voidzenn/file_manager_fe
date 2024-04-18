@@ -15,16 +15,18 @@ const FolderList = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-5 m-10">
-      {folders.map(({ id, path, parentFolderId }: IFolderData) => {
-        return (
-          <div className="flex gap-5" key={id}>
-            <Folder size={'20px'} />
-            <Label className="text-md"> {path} </Label>
-          </div>
-        );
-      })}
-    </div>
+    <>
+      <div className="flex flex-col gap-5 m-10">
+        {folders.map(({ id, path, parentFolderId }: IFolderData) => {
+          return (
+            <div className="flex gap-5" key={id}>
+              <Folder size={'20px'} />
+              <Label className="text-md"> {path} </Label>
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 };
 

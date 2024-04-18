@@ -63,6 +63,7 @@ interface IAuth {
     data: unknown;
     error: unknown;
     getRequest: (path: string) => void;
+    postRequest: (path:string, data?: unknown) => void;
   };
 }
 
@@ -104,6 +105,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
       data: {},
       error: {},
       getRequest: () => null,
+      postRequest: () => null
     },
   };
 
@@ -287,9 +289,9 @@ export const useAuthStore = create<IAuth>((set, getState) => {
     },
 
     api: {
-      getRequest: async (PATH) => {
+      getRequest: async (path: string) => {
         return await axiosConfig
-          .get(PATH, { headers: getState().auth.getHeaderToken() })
+          .get(path, { headers: getState().auth.getHeaderToken() })
           .then((data: AxiosResponse) => {
             set((state) => ({
               ...state,
@@ -317,6 +319,37 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             }
           });
       },
+      postRequest: async (path: string, data?: unknown) => {
+        return await axiosConfig
+          .post(path, data, { headers: getState().auth.getHeaderToken() })
+          .then((data: AxiosResponse) => {
+            // set((state) => ({
+            //   ...state,
+            //   api: {
+            //     ...state.api,
+            //     data: data,
+            //   },
+            // }));
+
+            // return data;
+            console.log(data);
+          })
+          .catch((error: AxiosError) => {
+            // if (error.response?.status === API_RESPONSE_CODE.unauthorized) {
+            //   getState().refreshToken.request();
+            // } else {
+            //   set((state) => ({
+            //     ...state,
+            //     api: {
+            //       ...state.api,
+            //       error: error,
+            //     },
+            //   }));
+
+            //   return error;
+            // }
+          });
+      }
     },
   };
 });
