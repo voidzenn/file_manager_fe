@@ -17,6 +17,14 @@ interface IFolder {
     setPathName: (pathName: string) => void;
   };
   createFolderRequest: (data?: ICreateFolderParams) => void;
+  addSingleFolderToList: (data: unknown) => void;
+}
+
+interface ICreatedFolderSocketData {
+  id: number;
+  path: string;
+  parent_folder_id: 1;
+  created_at: string;
 }
 
 export const useFoldersStore = create<IFolder>((set, getState) => {
@@ -34,7 +42,8 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
       })),
       request: () => null,
     },
-    createFolderRequest: () => null
+    createFolderRequest: () => null,
+    addSingleFolderToList: () => null
    };
 
   return {
@@ -62,5 +71,14 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
 
       await useAuthStore.getState().api.postRequest(FOLDER_CREATE_API, newData);
     },
+
+    addSingleFolderToList(data: unknown) {
+      const responseData = data as ICreatedFolderSocketData;
+
+      set((state) => ({
+        ...state,
+        folders: [responseData, ...state.folders],
+      }));
+    }
   };
 });

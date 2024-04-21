@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 
 import { useFoldersStore } from '@/store/useFolderStore';
-import { IFolderData } from '@/apis/folder/folderInterface';
+
 import { Folder } from 'lucide-react';
+import { IFolderData } from '@/apis/folder/folderInterface';
 import { Label } from '@/components/ui/label';
 
 const FolderList = () => {
   const { folders, getFoldersList } = useFoldersStore();
 
   useEffect(() => {
-    return () => {
-      getFoldersList();
-    }
+    getFoldersList();
   }, []);
 
   return (

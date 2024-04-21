@@ -1,23 +1,40 @@
-import { FolderPlus } from "lucide-react";
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui/dialog';
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { useFoldersStore } from "@/store/useFolderStore";
+import { useEffect, useState } from 'react';
+
+import { FolderPlus } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+
+import { useFoldersStore } from '@/store/useFolderStore';
+import { useActionCable } from '@/hooks/useActionCable';
 
 const CreateFolder = () => {
-  const { createFolder, createFolderRequest } = useFoldersStore();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const { createFolder, createFolderRequest, addSingleFolderToList } = useFoldersStore();
+  const { subscription, receivedData } = useActionCable('FolderChannel');
+
+  useEffect(() => {
+    subscription;
+  }, []);
+
+  useEffect(() => {
+    receivedData && addSingleFolderToList(receivedData);
+  }, [receivedData, addSingleFolderToList]);
 
   const handlePathInput = (e) => {
-    createFolder.setPathName(e?.target?.value)
-  }
+    createFolder.setPathName(e?.target?.value);
+  };
 
   const handleCreateFolder = () => {
     createFolderRequest();
-  }
+
+    // Note: Use success message to handle closing of dialog
+    setOpenDialog(false);
+  };
 
   return (
-    <Dialog>
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger className="w-full flex justify-end">
         <FolderPlus size={'25px'} />
       </DialogTrigger>
@@ -25,14 +42,25 @@ const CreateFolder = () => {
         <Label>Folder Name</Label>
         <Input onChange={handlePathInput} />
         <div className="w-full flex justify-end mt-2">
-          <DialogClose className="mr-4">Close</DialogClose>
-          <Button className="w-20" onClick={handleCreateFolder}>
+          <Button
+            className="mr-4"
+            onClick={() => {
+              setOpenDialog(false);
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            className="w-20"
+            disabled={!createFolder.pathName}
+            onClick={handleCreateFolder}
+          >
             Create
           </Button>
         </div>
       </DialogContent>
     </Dialog>
   );
-}
+};
 
 export default CreateFolder;
