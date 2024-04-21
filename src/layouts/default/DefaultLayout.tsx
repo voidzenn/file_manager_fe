@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import { ROUTES } from '@/constants/routes';
 import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
+import { ROUTES } from '@/constants/routes';
 
 interface IProp {
   children: ReactNode;
@@ -24,7 +25,10 @@ const DefaultLayout = ({ children }: IProp) => {
     <div className="flex justify-between">
       {auth.isAuthenticated() && <Sidebar />}
 
-      <main className="w-full h-full">{children}</main>
+      <main className="w-full h-full">
+        {auth.isAuthenticated() && <Header />}
+        {children}
+      </main>
     </div>
   );
 };

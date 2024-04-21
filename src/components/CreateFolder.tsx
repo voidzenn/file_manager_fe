@@ -1,0 +1,66 @@
+import { useEffect, useState } from 'react';
+
+import { FolderPlus } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+
+import { useFoldersStore } from '@/store/useFolderStore';
+import { useActionCable } from '@/hooks/useActionCable';
+
+const CreateFolder = () => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const { createFolder, createFolderRequest, addSingleFolderToList } = useFoldersStore();
+  const { subscription, receivedData } = useActionCable('FolderChannel');
+
+  useEffect(() => {
+    subscription;
+  }, []);
+
+  useEffect(() => {
+    receivedData && addSingleFolderToList(receivedData);
+  }, [receivedData, addSingleFolderToList]);
+
+  const handlePathInput = (e) => {
+    createFolder.setPathName(e?.target?.value);
+  };
+
+  const handleCreateFolder = () => {
+    createFolderRequest();
+
+    // Note: Use success message to handle closing of dialog
+    setOpenDialog(false);
+  };
+
+  return (
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <DialogTrigger className="w-full flex justify-end">
+        <FolderPlus size={'25px'} />
+      </DialogTrigger>
+      <DialogContent className="absolute py-8">
+        <Label>Folder Name</Label>
+        <Input onChange={handlePathInput} />
+        <div className="w-full flex justify-end mt-2">
+          <Button
+            className="mr-4"
+            onClick={() => {
+              setOpenDialog(false);
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            className="w-20"
+            disabled={!createFolder.pathName}
+            onClick={handleCreateFolder}
+          >
+            Create
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default CreateFolder;

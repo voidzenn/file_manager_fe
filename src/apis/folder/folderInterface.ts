@@ -7,3 +7,8 @@ export interface IFolderData {
 export interface IFolderListResponse {
   data: [IFolderData]
 }
+
+export interface ICreateFolderParams {
+  parentFolderId: null | number;
+  pathName: null | string;
+}

@@ -1,7 +1,8 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import { AxiosError, AxiosResponse } from 'axios';
 
 import {
+  IRefreshTokenResponse,
   ISigninErrorResponse,
   ISigninRequest,
   ISigninResponse,
@@ -10,20 +11,34 @@ import {
   ISignupErrorResponseData,
   ISignupRequest,
 } from '@/apis/auth/authInterface';
-import { signinRequest, signupRequest } from "@/apis/auth/authRequest";
+import {
+  signinRequest,
+  signupRequest,
+  refreshTokenRequest,
+} from '@/apis/auth/authRequest';
 import {
   getAuthTokenCookie,
   getAuthUserCookie,
+  getRefreshTokenCookie,
   setAuthTokenCookie,
   setAuthUserCookie,
+  setRefreshTokenCookie,
 } from '@/lib/cookie';
-import { SIGNIN_SUCCESS_RESPONSE_MESSAGE, SIGNUP_SUCCESS_RESPONSE_MESSAGE } from "@/constants/reponseMessage";
+import {
+  SIGNIN_SUCCESS_RESPONSE_MESSAGE,
+  SIGNUP_SUCCESS_RESPONSE_MESSAGE,
+} from '@/constants/reponseMessage';
+import axiosConfig from '@/apis/axiosConfig';
+import { API_RESPONSE_CODE } from '@/constants/apiResponseCode';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/constants/routes';
 
 interface IAuth {
   loading: boolean;
   auth: {
     accessToken: string | null;
-    getHeaderToken: () => void;
+    refreshToken: string | null;
+    getHeaderToken: () => { Authorization: '' };
     isAuthenticated: () => boolean;
   };
   signin: {
@@ -41,11 +56,21 @@ interface IAuth {
     initializeState: () => void;
     request: (nil: ISignupRequest) => void;
   };
+  refreshToken: {
+    request: () => void;
+  };
+  api: {
+    data: unknown;
+    error: unknown;
+    getRequest: (path: string) => void;
+    postRequest: (path:string, data?: unknown) => void;
+  };
 }
 
-export const useAuthStore = create<IAuth>((set) => {
+export const useAuthStore = create<IAuth>((set, getState) => {
   const auth = {
     accessToken: '',
+    refreshToken: '',
     getHeaderToken: () => false,
     isAuthenticated: () => false,
   };
@@ -57,7 +82,7 @@ export const useAuthStore = create<IAuth>((set) => {
       success: false,
       successMessage: '',
       errorMessage: '',
-      initializeState:() => null,
+      initializeState: () => null,
       request: () => null,
     },
     signup: {
@@ -73,11 +98,20 @@ export const useAuthStore = create<IAuth>((set) => {
       initializeState: () => null,
       request: () => null,
     },
+    refreshToken: {
+      request: () => null,
+    },
+    api: {
+      data: {},
+      error: {},
+      getRequest: () => null,
+      postRequest: () => null
+    },
   };
 
   const handleCookie = (
     { email, fname, lname }: ISigninResponse,
-    { token }: ISigninTokens
+    { token, refresh_token }: ISigninTokens
   ) => {
     const userData = {
       email: email,
@@ -86,6 +120,7 @@ export const useAuthStore = create<IAuth>((set) => {
     };
 
     setAuthTokenCookie(token);
+    setRefreshTokenCookie(refresh_token);
     setAuthUserCookie(userData);
   };
 
@@ -95,8 +130,7 @@ export const useAuthStore = create<IAuth>((set) => {
     auth: {
       getHeaderToken: () => {
         return {
-          Authorization:
-            useAuthStore.getState().auth.accessToken ?? getAuthTokenCookie(),
+          Authorization: getState().auth.accessToken ?? getAuthTokenCookie(),
         };
       },
       isAuthenticated: () => {
@@ -110,7 +144,7 @@ export const useAuthStore = create<IAuth>((set) => {
           ...state,
           signin: {
             ...state.signin,
-            ...initialState
+            ...initialState,
           },
         }));
       },
@@ -132,6 +166,7 @@ export const useAuthStore = create<IAuth>((set) => {
               auth: {
                 ...state.auth,
                 accessToken: metaData.token,
+                refreshToken: metaData.refresh_token
               },
               signin: {
                 ...state.signin,
@@ -153,7 +188,7 @@ export const useAuthStore = create<IAuth>((set) => {
               loading: false,
             }));
           });
-      }
+      },
     },
 
     signup: {
@@ -215,6 +250,106 @@ export const useAuthStore = create<IAuth>((set) => {
             }
           });
       },
+    },
+
+    refreshToken: {
+      request: async () => {
+        const refreshHeader = {
+          headers: {
+            Authorization: `Bearer ${
+              getState().auth.refreshToken ?? getRefreshTokenCookie()
+            }`,
+          },
+        };
+
+        console.log(refreshHeader);
+
+
+        await refreshTokenRequest(refreshHeader)
+          .then((data: AxiosResponse) => {
+            const response = data.data as IRefreshTokenResponse;
+            const token = response.meta.token;
+
+            setAuthTokenCookie(token);
+
+            set((state) => ({
+              ...state,
+              auth: {
+                ...state.auth,
+                refreshToken: token
+              }
+            }))
+          })
+          .catch(() => {
+            const navigate = useNavigate();
+
+            navigate(ROUTES.signin);
+          });
+      },
+    },
+
+    api: {
+      getRequest: async (path: string) => {
+        return await axiosConfig
+          .get(path, { headers: getState().auth.getHeaderToken() })
+          .then((data: AxiosResponse) => {
+            set((state) => ({
+              ...state,
+              api: {
+                ...state.api,
+                data: data
+              }
+            }))
+
+            return data;
+          })
+          .catch((error: AxiosError) => {
+            if (error.response?.status === API_RESPONSE_CODE.unauthorized) {
+              getState().refreshToken.request();
+            } else {
+              set((state) => ({
+                ...state,
+                api: {
+                  ...state.api,
+                  error: error,
+                },
+              }));
+
+              return error;
+            }
+          });
+      },
+      postRequest: async (path: string, data?: unknown) => {
+        return await axiosConfig
+          .post(path, data, { headers: getState().auth.getHeaderToken() })
+          .then((data: AxiosResponse) => {
+            // set((state) => ({
+            //   ...state,
+            //   api: {
+            //     ...state.api,
+            //     data: data,
+            //   },
+            // }));
+
+            // return data;
+            console.log(data);
+          })
+          .catch((error: AxiosError) => {
+            // if (error.response?.status === API_RESPONSE_CODE.unauthorized) {
+            //   getState().refreshToken.request();
+            // } else {
+            //   set((state) => ({
+            //     ...state,
+            //     api: {
+            //       ...state.api,
+            //       error: error,
+            //     },
+            //   }));
+
+            //   return error;
+            // }
+          });
+      }
     },
   };
 });

@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 import _isString from 'lodash/isString';
 import AES from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
-import { AUTH_TOKEN, AUTH_USER } from '@/constants/cookies';
+import { AUTH_TOKEN, REFRESH_TOKEN, AUTH_USER } from '@/constants/cookies';
 
 const CRYPTO_KEY = 'THIS SHOULD BE IN AN ENV FILE';
 const encrypData = (str: string) => AES.encrypt(str, CRYPTO_KEY).toString();
@@ -43,6 +43,16 @@ const getAuthTokenCookie = () => {
 const removeAuthTokenCookie = () => {
   customCookie.remove(AUTH_TOKEN);
 };
+// Refresh token
+const setRefreshTokenCookie = (value: string) => {
+  customCookie.set(REFRESH_TOKEN, value);
+};
+const getRefreshTokenCookie = () => {
+  return customCookie.get(REFRESH_TOKEN);
+};
+const removeRefreshTokenCookie = () => {
+  customCookie.remove(REFRESH_TOKEN);
+};
 // User Auth
 const setAuthUserCookie = (value: string | object) => {
   customCookie.set(AUTH_USER, value);
@@ -57,15 +67,16 @@ const removeAuthUserCookie = () => {
 // Logout remove cookies
 const removeAllCookie = () => {
   removeAuthTokenCookie();
+  removeRefreshTokenCookie();
   removeAuthUserCookie();
 }
 
 export {
   setAuthTokenCookie,
   getAuthTokenCookie,
-  removeAuthTokenCookie,
+  setRefreshTokenCookie,
+  getRefreshTokenCookie,
   setAuthUserCookie,
   getAuthUserCookie,
-  removeAuthUserCookie,
   removeAllCookie,
 };
