@@ -8,6 +8,7 @@ import { Input } from './ui/input';
 
 import { useFoldersStore } from '@/store/useFolderStore';
 import { useActionCable } from '@/hooks/useActionCable';
+import { FOLDER_CREATED } from '@/constants/socketActions';
 
 const CreateFolder = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -19,7 +20,9 @@ const CreateFolder = () => {
   }, []);
 
   useEffect(() => {
-    receivedData && addSingleFolderToList(receivedData);
+    receivedData &&
+      receivedData?.action === FOLDER_CREATED &&
+      addSingleFolderToList(receivedData);
   }, [receivedData, addSingleFolderToList]);
 
   const handlePathInput = (e) => {

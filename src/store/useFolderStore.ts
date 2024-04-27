@@ -21,10 +21,15 @@ interface IFolder {
 }
 
 interface ICreatedFolderSocketData {
-  id: number;
-  path: string;
-  parent_folder_id: 1;
-  created_at: string;
+  action: string,
+  data: [
+    {
+      id: number;
+      path: string;
+      parent_folder_id: number;
+      created_at: string;
+    }
+  ];
 }
 
 export const useFoldersStore = create<IFolder>((set, getState) => {
@@ -77,7 +82,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
 
       set((state) => ({
         ...state,
-        folders: [responseData, ...state.folders],
+        folders: [responseData.data[0], ...state.folders],
       }));
     }
   };
