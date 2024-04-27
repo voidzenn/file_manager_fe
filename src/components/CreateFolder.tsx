@@ -38,9 +38,13 @@ const CreateFolder = () => {
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <DialogTrigger className="w-full flex justify-end">
-        <FolderPlus size={'25px'} />
-      </DialogTrigger>
+      <div className="w-full flex justify-end">
+        <DialogTrigger>
+          <Button className="white bg-white hover:bg-black hover:bg-opacity-10">
+            <FolderPlus color={"black"} size={'25px'} />
+          </Button>
+        </DialogTrigger>
+      </div>
       <DialogContent className="absolute py-8">
         <Label>Folder Name</Label>
         <Input onChange={handlePathInput} />
