@@ -262,9 +262,6 @@ export const useAuthStore = create<IAuth>((set, getState) => {
           },
         };
 
-        console.log(refreshHeader);
-
-
         await refreshTokenRequest(refreshHeader)
           .then((data: AxiosResponse) => {
             const response = data.data as IRefreshTokenResponse;
@@ -332,7 +329,6 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             // }));
 
             // return data;
-            console.log(data);
           })
           .catch((error: AxiosError) => {
             // if (error.response?.status === API_RESPONSE_CODE.unauthorized) {

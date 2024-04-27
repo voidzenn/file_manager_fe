@@ -1,27 +1,16 @@
-import { useEffect } from 'react';
-
-import { useFoldersStore } from '@/store/useFolderStore';
 import { Label } from './ui/label';
 import { Folder } from 'lucide-react';
 import { IFolderData } from '@/apis/folder/folderInterface';
 
-const FolderList = () => {
-  const { folders, getFoldersList } = useFoldersStore();
+interface IProps {
+  folders: [IFolderData] | [];
+}
 
-  useEffect(() => {
-    getFoldersList();
-  }, []);
-
-  useEffect(() => {
-    console.log(folders);
-  }, [folders]);
-
-  const handleFolderClick = (uniqueToken: string) => {
-    alert(uniqueToken);
-  }
+const FolderList = ({ folders }: IProps) => {
+  const handleFolderClick = (uniqueToken: string) => {};
 
   return (
-    <div className="flex flex-col gap-2 m-10">
+    <div className="flex flex-col m-10">
       {folders.map(({ unique_token, path, parentFolderId }: IFolderData) => {
         return (
           <div

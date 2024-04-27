@@ -10,6 +10,7 @@ import PrivateRoute from '@/layouts/private/PrivateRoute';
 import Signup from '@/features/Auth/Signup';
 import Signin from '@/features/Auth/Signin';
 import Home from "@/features/Home/Home";
+import Folders from '@/features/Folders/Folders';
 
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -53,6 +54,16 @@ const Routes = () => {
             <PrivateRoute>
               <DefaultLayout>
                 <Home />
+              </DefaultLayout>
+            </PrivateRoute>
+          ),
+        },
+        {
+          path: ROUTES.folders,
+          element: (
+            <PrivateRoute>
+              <DefaultLayout>
+                <Folders />
               </DefaultLayout>
             </PrivateRoute>
           ),

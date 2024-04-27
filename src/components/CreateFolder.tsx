@@ -39,10 +39,8 @@ const CreateFolder = () => {
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <div className="w-full flex justify-end">
-        <DialogTrigger>
-          <Button className="white bg-white hover:bg-black hover:bg-opacity-10">
-            <FolderPlus color={"black"} size={'25px'} />
-          </Button>
+        <DialogTrigger className="p-2 bg-white hover:bg-black hover:bg-opacity-10">
+          <FolderPlus color={'black'} size={'25px'} />
         </DialogTrigger>
       </div>
       <DialogContent className="absolute py-8">

@@ -1,9 +1,21 @@
-import FolderList from "@/components/FolderList";
+import { useEffect } from 'react';
+
+import FolderList from '@/components/FolderList';
+
+import { useFoldersStore } from '@/store/useFolderStore';
 
 const Home = () => {
+  const { folders, getFoldersList } = useFoldersStore();
+
+  useEffect(() => {
+    return () => {
+      getFoldersList();
+    }
+  }, []);
+
   return (
     <>
-      <FolderList />
+     <FolderList folders={folders} />
     </>
   );
 };
