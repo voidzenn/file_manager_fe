@@ -1,13 +1,24 @@
+import { useNavigate      } from 'react-router-dom';
+
 import { Label } from './ui/label';
 import { Folder } from 'lucide-react';
+
 import { IFolderData } from '@/apis/folder/folderInterface';
+import { ROUTES } from '@/constants/routes';
+import { useFoldersStore } from '@/store/useFolderStore';
 
 interface IProps {
   folders: [IFolderData] | [];
 }
 
 const FolderList = ({ folders }: IProps) => {
-  const handleFolderClick = (uniqueToken: string) => {};
+  const { getFoldersList } = useFoldersStore();
+  const navigate = useNavigate();
+
+  const handleFolderClick = (uniqueToken: string) => {
+    navigate(ROUTES.folders + `/${uniqueToken}`, { state: { uniqueToken: uniqueToken } });
+    getFoldersList(uniqueToken);
+  };
 
   return (
     <div className="flex flex-col m-10">

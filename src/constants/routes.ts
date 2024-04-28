@@ -2,6 +2,6 @@ export const ROUTES = {
   root: '/',
   signin: '/signin',
   signup: '/signup',
-  home: '/home',
-  folders: '/folders'
-}
+  folders: '/folders',
+  foldersWithId: '/folders/:id'
+};

@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -14,12 +14,18 @@ interface IProp {
 const DefaultLayout = ({ children }: IProp) => {
   const { auth } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (auth.isAuthenticated()) {
-      navigate(ROUTES.home);
+    const currentPath = location.pathname
+
+    if (
+      (currentPath === ROUTES.signin || currentPath === ROUTES.signup) &&
+      auth.isAuthenticated()
+    ) {
+      navigate(ROUTES.folders);
     }
-  }, [auth, navigate]);
+  }, [auth, location, navigate]);
 
   return (
     <div className="flex justify-between">

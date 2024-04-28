@@ -11,7 +11,7 @@ import { FOLDER_CREATE_API, FOLDER_LIST_API } from '@/constants/apis';
 
 interface IFolder {
   folders: [IFolderData] | [];
-  getFoldersList: () => void;
+  getFoldersList: (uniqueToken?: string) => void;
   createFolder: {
     pathName: string | null;
     setPathName: (pathName: string) => void;
@@ -54,12 +54,16 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
   return {
     ...initialState,
 
-    getFoldersList: async () => {
-      await useAuthStore.getState().api.getRequest(FOLDER_LIST_API);
+    getFoldersList: async (uniqueToken?: string) => {
+      const url = !uniqueToken
+        ? FOLDER_LIST_API
+        : FOLDER_LIST_API + `?unique_token=${uniqueToken}`;
+
+      await useAuthStore.getState().api.getRequest(url);
 
       const response = useAuthStore.getState().api.data as AxiosResponse;
       const responseData = response.data as IFolderListResponse;
-      const folders = responseData.data;
+      const folders = responseData?.data ?? [];
 
       set((state) => ({
         ...state,
@@ -82,7 +86,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
 
       set((state) => ({
         ...state,
-        folders: [responseData.data[0], ...state.folders],
+        folders: [responseData?.data[0], ...state.folders],
       }));
     }
   };

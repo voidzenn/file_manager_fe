@@ -1,4 +1,4 @@
-import { 
+import {
   Navigate,
   RouterProvider,
   createBrowserRouter,
@@ -9,7 +9,6 @@ import DefaultLayout from '@/layouts/default/DefaultLayout';
 import PrivateRoute from '@/layouts/private/PrivateRoute';
 import Signup from '@/features/Auth/Signup';
 import Signin from '@/features/Auth/Signin';
-import Home from "@/features/Home/Home";
 import Folders from '@/features/Folders/Folders';
 
 import { ROUTES } from "@/constants/routes";
@@ -21,7 +20,7 @@ const Routes = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated()) {
-      redirect(ROUTES.home);
+      redirect(ROUTES.folders);
     }
   }, [auth]);
 
@@ -49,17 +48,17 @@ const Routes = () => {
           ),
         },
         {
-          path: ROUTES.home,
+          path: ROUTES.folders,
           element: (
             <PrivateRoute>
               <DefaultLayout>
-                <Home />
+                <Folders />
               </DefaultLayout>
             </PrivateRoute>
           ),
         },
         {
-          path: ROUTES.folders,
+          path: ROUTES.foldersWithId,
           element: (
             <PrivateRoute>
               <DefaultLayout>
