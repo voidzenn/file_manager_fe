@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { FolderPlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
@@ -6,12 +7,13 @@ import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 
-import { useFoldersStore } from '@/store/useFolderStore';
+import { ICreatedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
 import { useActionCable } from '@/hooks/useActionCable';
 import { FOLDER_CREATED } from '@/constants/socketActions';
 
 const CreateFolder = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const { id } = useParams();
   const { createFolder, createFolderRequest, addSingleFolderToList } = useFoldersStore();
   const { subscription, receivedData } = useActionCable('FolderChannel');
 
@@ -20,10 +22,19 @@ const CreateFolder = () => {
   }, []);
 
   useEffect(() => {
-    receivedData &&
-      receivedData?.action === FOLDER_CREATED &&
-      addSingleFolderToList(receivedData);
-  }, [receivedData, addSingleFolderToList]);
+    // Set token same as in URL params token
+    id && useFoldersStore.getState().createFolder.setParentFolderToken(id);
+  }, [id]);
+
+  useEffect(() => {
+    const responseData = receivedData as ICreatedFolderSocketData;
+    const isFolderCreateAction =
+      responseData && responseData.action === FOLDER_CREATED;
+
+    if (isFolderCreateAction && createFolder.parentFolderToken === id) {
+      addSingleFolderToList(responseData);
+    }
+  }, [receivedData, addSingleFolderToList, id, createFolder.parentFolderToken]);
 
   const handlePathInput = (e) => {
     createFolder.setPathName(e?.target?.value);

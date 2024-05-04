@@ -1,4 +1,4 @@
-import { useNavigate      } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { Label } from './ui/label';
 import { Folder } from 'lucide-react';
@@ -6,12 +6,14 @@ import { Folder } from 'lucide-react';
 import { IFolderData } from '@/apis/folder/folderInterface';
 import { ROUTES } from '@/constants/routes';
 import { useFoldersStore } from '@/store/useFolderStore';
+import { Button } from './ui/button';
 
 interface IProps {
   folders: [IFolderData] | [];
 }
 
 const FolderList = ({ folders }: IProps) => {
+  const { id } = useParams();
   const { getFoldersList } = useFoldersStore();
   const navigate = useNavigate();
 
@@ -21,7 +23,18 @@ const FolderList = ({ folders }: IProps) => {
   };
 
   return (
-    <div className="flex flex-col m-10">
+    <div className="flex flex-col m-10 mt-1">
+      <div className="min-h-10 w-full mt-5">
+        {id && (
+          <Button
+            className="w-full justify-start bg-white hover:bg-black hover:bg-opacity-10"
+            onClick={() => navigate(-1)}
+          >
+            <Label className="text-black">...</Label>
+          </Button>
+        )}
+      </div>
+
       {folders.map(({ unique_token, path, parentFolderId }: IFolderData) => {
         return (
           <div
