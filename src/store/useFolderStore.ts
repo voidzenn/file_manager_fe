@@ -4,27 +4,34 @@ import { AxiosResponse } from 'axios';
 import { useAuthStore } from './useAuthStore';
 import {
   IFolderData,
-  IFolderListResponse,
-  ICreateFolderParams
+  IFolderListResponse
 } from '@/apis/folder/folderInterface';
 import { FOLDER_CREATE_API, FOLDER_LIST_API } from '@/constants/apis';
 
 interface IFolder {
   folders: [IFolderData] | [];
-  getFoldersList: () => void;
+  getFoldersList: (uniqueToken?: string) => void;
   createFolder: {
     pathName: string | null;
+    parentFolderToken: string | null;
     setPathName: (pathName: string) => void;
+    setParentFolderToken: (parentFolderToken: string) => void;
   };
-  createFolderRequest: (data?: ICreateFolderParams) => void;
+  createFolderRequest: () => void;
   addSingleFolderToList: (data: unknown) => void;
 }
 
-interface ICreatedFolderSocketData {
-  id: number;
-  path: string;
-  parent_folder_id: 1;
-  created_at: string;
+export interface ICreatedFolderSocketData {
+  action: string,
+  data: [
+    {
+      id: number;
+      unique_token: string;
+      path: string;
+      parent_folder_id: number;
+      created_at: string;
+    }
+  ];
 }
 
 export const useFoldersStore = create<IFolder>((set, getState) => {
@@ -33,28 +40,42 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     getFolderList: () => null,
     createFolder: {
       pathName: '',
-      setPathName: (pathName: string) => set((state) => ({
-        ...state,
-        createFolder: {
-          ...state.createFolder,
-          pathName: pathName
-        }
-      })),
+      parentFolderToken: null,
+      setPathName: (pathName: string) =>
+        set((state) => ({
+          ...state,
+          createFolder: {
+            ...state.createFolder,
+            pathName: pathName,
+          },
+        })),
+      setParentFolderToken: (parentFolderToken: string) =>
+        set((state) => ({
+          ...state,
+          createFolder: {
+            ...state.createFolder,
+            parentFolderToken: parentFolderToken
+          },
+        })),
       request: () => null,
     },
     createFolderRequest: () => null,
-    addSingleFolderToList: () => null
-   };
+    addSingleFolderToList: () => null,
+  };
 
   return {
     ...initialState,
 
-    getFoldersList: async () => {
-      await useAuthStore.getState().api.getRequest(FOLDER_LIST_API);
+    getFoldersList: async (uniqueToken?: string) => {
+      const url = !uniqueToken
+        ? FOLDER_LIST_API
+        : FOLDER_LIST_API + `?unique_token=${uniqueToken}`;
+
+      await useAuthStore.getState().api.getRequest(url);
 
       const response = useAuthStore.getState().api.data as AxiosResponse;
       const responseData = response.data as IFolderListResponse;
-      const folders = responseData.data;
+      const folders = responseData?.data ?? [];
 
       set((state) => ({
         ...state,
@@ -65,9 +86,10 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     createFolderRequest: async () => {
       const newData = {
         folder: {
-          path: getState().createFolder.pathName + '/'
-        }
-      }
+          path: getState().createFolder.pathName + '/',
+          parent_unique_token: getState().createFolder.parentFolderToken
+        },
+      };
 
       await useAuthStore.getState().api.postRequest(FOLDER_CREATE_API, newData);
     },
@@ -77,7 +99,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
 
       set((state) => ({
         ...state,
-        folders: [responseData, ...state.folders],
+        folders: [responseData?.data[0], ...state.folders]
       }));
     }
   };

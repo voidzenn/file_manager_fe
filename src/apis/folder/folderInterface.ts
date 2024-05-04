@@ -1,5 +1,6 @@
 export interface IFolderData {
   id: number | null;
+  unique_token: string | null;
   path: string | null;
   parentFolderId: number | null;
 }

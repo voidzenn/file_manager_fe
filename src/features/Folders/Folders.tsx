@@ -1,23 +1,22 @@
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import FolderList from '@/components/FolderList';
-
 import { useFoldersStore } from '@/store/useFolderStore';
 
-const Home = () => {
+const Folders = () => {
   const { folders, getFoldersList } = useFoldersStore();
+  const { id } = useParams();
 
   useEffect(() => {
-    return () => {
-      getFoldersList();
-    }
-  }, []);
+    getFoldersList(id);
+  }, [id, getFoldersList]);
 
   return (
     <>
-     <FolderList folders={folders} />
+      <FolderList folders={folders} />
     </>
   );
 };
 
-export default Home;
+export default Folders;

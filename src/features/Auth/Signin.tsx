@@ -72,7 +72,7 @@ const Signin = () => {
     ) {
       const timeout = setTimeout(() => {
         signin.initializeState();
-        navigate(ROUTES.home);
+        navigate(ROUTES.folders);
       }, 500000);
 
       return () => clearTimeout(timeout);

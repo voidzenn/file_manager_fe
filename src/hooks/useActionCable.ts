@@ -3,15 +3,20 @@ import ActionCable, { Channel } from 'actioncable';
 
 type SendFunction = (action: string, message: unknown) => void;
 
+interface IReceivedData {
+  action: string;
+  data: [unknown];
+}
+
 interface HookReturnType {
   subscription: Channel | null;
-  receivedData: unknown;
+  receivedData: IReceivedData | null | undefined;
   send: SendFunction | null;
 }
 
 export const useActionCable = (channelName: string): HookReturnType => {
   const [subscription, setSubscription] = useState<Channel | null>(null);
-  const [receivedData, setReceivedData] = useState<unknown>();
+  const [receivedData, setReceivedData] = useState<IReceivedData>();
   const [send, setSend] = useState<SendFunction | null>(null);
 
   useEffect(() => {
@@ -26,7 +31,7 @@ export const useActionCable = (channelName: string): HookReturnType => {
         console.log('Disconnected');
       },
 
-      received(data: unknown) {
+      received(data: IReceivedData) {
         setReceivedData(data);
       },
     }) as Channel;
