@@ -23,7 +23,7 @@ const FolderList = ({ folders }: IProps) => {
   };
 
   return (
-    <div className="flex flex-col m-10 mt-1">
+    <div className="flex flex-col">
       <div className="min-h-10 w-full mt-5">
         {id && (
           <Button
