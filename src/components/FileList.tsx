@@ -30,7 +30,6 @@ const FileList = ({ files }: IProps) => {
           <div
             className="flex gap-5 px-2 py-3 hover:cursor-pointer hover:bg-black hover:bg-opacity-5"
             key={unique_token}
-            // onClick={() => handleFolderClick(String(unique_token))}
           >
             <FileLogo file_extension={file_extension} />
             <Label className="text-md"> {filename} </Label>
