@@ -49,8 +49,11 @@ const CreateFolder = () => {
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <div className="w-full flex justify-end">
-        <DialogTrigger className="p-2 bg-white hover:bg-black hover:bg-opacity-10">
+      <div className="w-10">
+        <DialogTrigger
+          className="p-2 bg-white hover:bg-black hover:bg-opacity-10"
+          title="Create Folder"
+        >
           <FolderPlus color={'black'} size={'25px'} />
         </DialogTrigger>
       </div>
@@ -59,6 +62,8 @@ const CreateFolder = () => {
         <Input onChange={handlePathInput} />
         <div className="w-full flex justify-end mt-2">
           <Button
+            type="button"
+            variant={'ghost'}
             className="mr-4"
             onClick={() => {
               setOpenDialog(false);

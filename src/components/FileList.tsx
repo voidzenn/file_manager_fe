@@ -13,12 +13,12 @@ interface FileLogoProp {
 
 const FileLogo = ({ file_extension }: FileLogoProp) => {
   const logoSize = '20px';
+  const imageFormat = ['jpg', 'png'];
 
-  switch (file_extension) {
-    case 'jpg':
-      return <Image size={logoSize} />;
-    default:
-      return <File size={logoSize} />;
+  if (file_extension && imageFormat.includes(file_extension)) {
+    return <Image size={logoSize} />;
+  } else {
+    return <File size={logoSize} />;
   }
 };
 

@@ -1,9 +1,11 @@
 import CreateFolder from "./CreateFolder";
+import UploadFile from "./UploadFile";
 
 const Header = () => {
   return (
-    <div className="flex border-b-2 px-5 py-5">
+    <div className="flex gap-5 border-b-2 justify-end px-5 py-5">
       <CreateFolder />
+      <UploadFile />
     </div>
   );
 };

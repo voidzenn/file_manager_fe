@@ -3,18 +3,24 @@ import { create } from 'zustand';
 import { useAuthStore } from './useAuthStore';
 
 import { IFileData, IFileListResponse } from '@/apis/file/fileInterface';
-import { FILE_LIST_API } from '@/constants/apis';
+import { FILE_LIST_API, UPLOAD_FILE_API } from '@/constants/apis';
 import { AxiosResponse } from 'axios';
 
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
+  uploadFile: {
+    request: (files: FileList) => void;
+  };
 }
 
-export const useFileStore = create<IFile>((set) => {
+export const useFileStore = create<IFile>((set, getState) => {
   const initialState = {
     files: [],
     getFileList: () => null,
+    uploadFile: {
+      request: () => null
+    }
   }
 
   return {
@@ -35,6 +41,21 @@ export const useFileStore = create<IFile>((set) => {
         ...state,
         files: files,
       }));
+    },
+
+    uploadFile: {
+      request: async (files: FileList) => {
+        const formData = new FormData();
+        const headerOptions = {
+          'Content-Type': 'multipart/form-data',
+        };
+
+        formData.append('data[file_upload]', files[0]);
+
+        useAuthStore
+          .getState()
+          .api.postRequest(UPLOAD_FILE_API, formData, headerOptions);
+      },
     },
   };
 });

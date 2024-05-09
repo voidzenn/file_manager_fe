@@ -63,7 +63,7 @@ interface IAuth {
     data: unknown;
     error: unknown;
     getRequest: (path: string) => void;
-    postRequest: (path:string, data?: unknown) => void;
+    postRequest: (path:string, data?: unknown, options?: unknown) => void;
   };
 }
 
@@ -166,7 +166,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
               auth: {
                 ...state.auth,
                 accessToken: metaData.token,
-                refreshToken: metaData.refresh_token
+                refreshToken: metaData.refresh_token,
               },
               signin: {
                 ...state.signin,
@@ -273,9 +273,9 @@ export const useAuthStore = create<IAuth>((set, getState) => {
               ...state,
               auth: {
                 ...state.auth,
-                refreshToken: token
-              }
-            }))
+                refreshToken: token,
+              },
+            }));
           })
           .catch(() => {
             const navigate = useNavigate();
@@ -294,9 +294,9 @@ export const useAuthStore = create<IAuth>((set, getState) => {
               ...state,
               api: {
                 ...state.api,
-                data: data
-              }
-            }))
+                data: data,
+              },
+            }));
 
             return data;
           })
@@ -316,9 +316,13 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             }
           });
       },
-      postRequest: async (path: string, data?: unknown) => {
+      postRequest: async (path: string, data?: unknown, options?: unknown) => {
+        const headers = getState().auth.getHeaderToken();
+
+        options && Object.assign(headers, options);
+
         return await axiosConfig
-          .post(path, data, { headers: getState().auth.getHeaderToken() })
+          .post(path, data, { headers: headers })
           .then((data: AxiosResponse) => {
             // set((state) => ({
             //   ...state,
@@ -327,7 +331,6 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             //     data: data,
             //   },
             // }));
-
             // return data;
           })
           .catch((error: AxiosError) => {
@@ -341,11 +344,10 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             //       error: error,
             //     },
             //   }));
-
             //   return error;
             // }
           });
-      }
+      },
     },
   };
 });
