@@ -331,7 +331,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             //     data: data,
             //   },
             // }));
-            // return data;
+            return data;
           })
           .catch((error: AxiosError) => {
             // if (error.response?.status === API_RESPONSE_CODE.unauthorized) {
@@ -346,6 +346,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             //   }));
             //   return error;
             // }
+            return error;
           });
       },
     },
