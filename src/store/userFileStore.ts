@@ -10,6 +10,8 @@ interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
   uploadFile: {
+    folderUniqueToken: string | null;
+    setFolderUniqueToken: (token: string | null) => void;
     request: (files: FileList) => void;
   };
 }
@@ -19,9 +21,11 @@ export const useFileStore = create<IFile>((set, getState) => {
     files: [],
     getFileList: () => null,
     uploadFile: {
-      request: () => null
-    }
-  }
+      folderUniqueToken: '',
+      setFolderUniqueToken: () => null,
+      request: () => null,
+    },
+  };
 
   return {
     ...initialState,
@@ -44,11 +48,26 @@ export const useFileStore = create<IFile>((set, getState) => {
     },
 
     uploadFile: {
+      setFolderUniqueToken: (token: string | null) =>
+        set((state) => ({
+          ...state,
+          uploadFile: {
+            ...state.uploadFile,
+            folderUniqueToken: token,
+          },
+        })),
+
       request: async (files: FileList) => {
         const formData = new FormData();
         const headerOptions = {
           'Content-Type': 'multipart/form-data',
         };
+
+        const folderToken = getState().uploadFile.folderUniqueToken;
+
+        if (folderToken) {
+          formData.append('data[folder_unique_token]', folderToken);
+        }
 
         formData.append('data[file_upload]', files[0]);
 

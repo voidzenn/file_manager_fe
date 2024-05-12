@@ -5,7 +5,6 @@ import { Folder } from 'lucide-react';
 
 import { IFolderData } from '@/apis/folder/folderInterface';
 import { ROUTES } from '@/constants/routes';
-import { useFoldersStore } from '@/store/useFolderStore';
 import { Button } from './ui/button';
 
 interface IProps {
@@ -14,12 +13,10 @@ interface IProps {
 
 const FolderList = ({ folders }: IProps) => {
   const { id } = useParams();
-  const { getFoldersList } = useFoldersStore();
   const navigate = useNavigate();
 
   const handleFolderClick = (uniqueToken: string) => {
     navigate(ROUTES.folders + `/${uniqueToken}`, { state: { uniqueToken: uniqueToken } });
-    getFoldersList(uniqueToken);
   };
 
   return (

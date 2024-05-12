@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { FileUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
@@ -9,6 +10,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFileStore } from '@/store/userFileStore';
+import { useActionCable } from '@/hooks/useActionCable';
 
 const UploadFileSchema = z.object({
   files: z
@@ -21,7 +23,10 @@ const UploadFileSchema = z.object({
 const UploadFile = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [disableUpload, setDisableUpload] = useState<boolean>(true);
+  const { id } = useParams();
   const { uploadFile } = useFileStore();
+  const { subscription, receivedData } = useActionCable('FileChannel');
+
   const form = useForm<z.infer<typeof UploadFileSchema>>({
     resolver: zodResolver(UploadFileSchema),
     defaultValues: {
@@ -29,6 +34,18 @@ const UploadFile = () => {
     },
   });
   const filesRef = form.register('files', { required: true });
+
+  useEffect(() => {
+    subscription;
+  }, []);
+
+  useEffect(() => {
+    useFileStore.getState().uploadFile.setFolderUniqueToken(id ?? null);
+  }, [id]);
+
+  useEffect(() => {
+    receivedData && console.log(receivedData);
+  }, [receivedData]);
 
   const onSubmit = async (values: z.infer<typeof UploadFileSchema>) => {
     await uploadFile.request(values.files);

@@ -23,7 +23,7 @@ const CreateFolder = () => {
 
   useEffect(() => {
     // Set token same as in URL params token
-    id && useFoldersStore.getState().createFolder.setParentFolderToken(id);
+    useFoldersStore.getState().createFolder.setParentFolderToken(id ?? null);
   }, [id]);
 
   useEffect(() => {
@@ -31,8 +31,14 @@ const CreateFolder = () => {
     const isFolderCreateAction =
       responseData && responseData.action === FOLDER_CREATED;
 
-    if (isFolderCreateAction && createFolder.parentFolderToken === id) {
-      addSingleFolderToList(responseData);
+    if (isFolderCreateAction) {
+      const parentFolderId = responseData.data[0].parent_folder_id;
+
+      if (createFolder.parentFolderToken === id && parentFolderId !== null) {
+        addSingleFolderToList(responseData);
+      } else if (createFolder.parentFolderToken === null && parentFolderId === null) {
+        addSingleFolderToList(responseData);
+      }
     }
   }, [receivedData, addSingleFolderToList, id, createFolder.parentFolderToken]);
 
