@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { FileUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+
 import { useFileStore } from '@/store/userFileStore';
 import { useActionCable } from '@/hooks/useActionCable';
+import { IFileListResponse } from '@/apis/file/fileInterface';
+import { FILE_CREATED } from '@/constants/socketActions';
 
 const UploadFileSchema = z.object({
   files: z
@@ -24,7 +27,7 @@ const UploadFile = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [disableUpload, setDisableUpload] = useState<boolean>(true);
   const { id } = useParams();
-  const { uploadFile } = useFileStore();
+  const { uploadFile, addFileToFileList } = useFileStore();
   const { subscription, receivedData } = useActionCable('FileChannel');
 
   const form = useForm<z.infer<typeof UploadFileSchema>>({
@@ -44,11 +47,25 @@ const UploadFile = () => {
   }, [id]);
 
   useEffect(() => {
-    receivedData && console.log(receivedData);
-  }, [receivedData]);
+    const responseData = receivedData as IFileListResponse;
+    const isFileCreation = responseData && responseData.action === FILE_CREATED;
+
+    if (isFileCreation) {
+      const folderId = responseData.data[0].folder_id;
+
+      if (uploadFile.folderUniqueToken === id && folderId !== null) {
+        addFileToFileList(responseData);
+      } else if (uploadFile.folderUniqueToken === null && folderId === null) {
+        addFileToFileList(responseData);
+      }
+    }
+  }, [id, receivedData, uploadFile.folderUniqueToken , addFileToFileList]);
 
   const onSubmit = async (values: z.infer<typeof UploadFileSchema>) => {
     await uploadFile.request(values.files);
+
+    // Use success on later improvements to close dialog
+    setOpenDialog(false);
   };
 
   return (

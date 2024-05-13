@@ -6,9 +6,25 @@ import { IFileData, IFileListResponse } from '@/apis/file/fileInterface';
 import { FILE_LIST_API, UPLOAD_FILE_API } from '@/constants/apis';
 import { AxiosResponse } from 'axios';
 
+export interface ICreatedFileSocketData {
+  action: string;
+  data: [
+    {
+      id: number | null;
+      unique_token: string | null;
+      name: string | null;
+      filename: string | null;
+      file_extension: string | null;
+      folder_id: number | null;
+      created_at: string;
+    }
+  ];
+}
+
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
+  addFileToFileList: (data: unknown) => void;
   uploadFile: {
     folderUniqueToken: string | null;
     setFolderUniqueToken: (token: string | null) => void;
@@ -20,6 +36,7 @@ export const useFileStore = create<IFile>((set, getState) => {
   const initialState = {
     files: [],
     getFileList: () => null,
+    addFileToFileList: () => null,
     uploadFile: {
       folderUniqueToken: '',
       setFolderUniqueToken: () => null,
@@ -33,7 +50,7 @@ export const useFileStore = create<IFile>((set, getState) => {
     getFileList: async (uniqueToken?: string) => {
       const url = !uniqueToken
         ? FILE_LIST_API
-        : FILE_LIST_API + `?unique_token=${uniqueToken}`;
+        : FILE_LIST_API + `?folder_unique_token=${uniqueToken}`;
 
       await useAuthStore.getState().api.getRequest(url);
 
@@ -44,6 +61,15 @@ export const useFileStore = create<IFile>((set, getState) => {
       set((state) => ({
         ...state,
         files: files,
+      }));
+    },
+
+    addFileToFileList: (data: unknown) => {
+      const responseData = data as ICreatedFileSocketData;
+
+      set((state) => ({
+        ...state,
+        files: [responseData?.data[0], ...state.files],
       }));
     },
 

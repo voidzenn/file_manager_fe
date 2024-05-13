@@ -4,8 +4,9 @@ export interface IFileData {
   name: string | null;
   filename: string | null;
   file_extension: string | null;
+  folder_id: number | null;
 }
 
 export interface IFileListResponse {
-  data: [IFileData]
+  data: [IFileData];
 }
