@@ -10,12 +10,16 @@ import { Input } from './ui/input';
 import { ICreatedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
 import { useActionCable } from '@/hooks/useActionCable';
 import { FOLDER_CREATED } from '@/constants/socketActions';
+import { getAuthTokenCookie } from '@/lib/cookie';
 
 const CreateFolder = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const { id } = useParams();
   const { createFolder, createFolderRequest, addSingleFolderToList } = useFoldersStore();
-  const { subscription, receivedData } = useActionCable('FolderChannel');
+  const { subscription, receivedData } = useActionCable(
+    'FolderChannel',
+    String(getAuthTokenCookie())
+  );
 
   useEffect(() => {
     subscription;

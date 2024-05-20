@@ -14,13 +14,13 @@ interface HookReturnType {
   send: SendFunction | null;
 }
 
-export const useActionCable = (channelName: string): HookReturnType => {
+export const useActionCable = (channelName: string, token: string): HookReturnType => {
   const [subscription, setSubscription] = useState<Channel | null>(null);
   const [receivedData, setReceivedData] = useState<IReceivedData>();
   const [send, setSend] = useState<SendFunction | null>(null);
 
   useEffect(() => {
-    const consumer = ActionCable.createConsumer('ws://localhost:3000/cable');
+    const consumer = ActionCable.createConsumer(`ws://localhost:3000/cable?token=${token}`);
 
     const newSubscription = consumer.subscriptions.create(channelName, {
       connected() {

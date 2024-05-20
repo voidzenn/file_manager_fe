@@ -1,5 +1,5 @@
 import { Label } from "@radix-ui/react-label";
-import { File, Image } from "lucide-react";
+import { File, Image, Video } from "lucide-react";
 
 import { IFileData } from '@/apis/file/fileInterface';
 
@@ -14,11 +14,16 @@ interface FileLogoProp {
 const FileLogo = ({ file_extension }: FileLogoProp) => {
   const logoSize = '20px';
   const imageFormat = ['jpg', 'png'];
+  const videoFormat = ['mp4'];
+  
+  if(!file_extension) {
+    return <File size={logoSize} />
+  }
 
-  if (file_extension && imageFormat.includes(file_extension)) {
+  if (imageFormat.includes(file_extension)) {
     return <Image size={logoSize} />;
-  } else {
-    return <File size={logoSize} />;
+  } else if (videoFormat.includes(file_extension)) {
+    return <Video size={logoSize} />;
   }
 };
 

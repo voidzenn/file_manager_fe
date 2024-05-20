@@ -14,6 +14,7 @@ import { useFileStore } from '@/store/userFileStore';
 import { useActionCable } from '@/hooks/useActionCable';
 import { IFileListResponse } from '@/apis/file/fileInterface';
 import { FILE_CREATED } from '@/constants/socketActions';
+import { getAuthTokenCookie } from '@/lib/cookie';
 
 const UploadFileSchema = z.object({
   files: z
@@ -28,7 +29,7 @@ const UploadFile = () => {
   const [disableUpload, setDisableUpload] = useState<boolean>(true);
   const { id } = useParams();
   const { uploadFile, addFileToFileList } = useFileStore();
-  const { subscription, receivedData } = useActionCable('FileChannel');
+  const { subscription, receivedData } = useActionCable('FileChannel', String(getAuthTokenCookie()));
 
   const form = useForm<z.infer<typeof UploadFileSchema>>({
     resolver: zodResolver(UploadFileSchema),
