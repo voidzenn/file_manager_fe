@@ -15,7 +15,7 @@ interface IFolder {
     pathName: string | null;
     parentFolderToken: string | null;
     setPathName: (pathName: string) => void;
-    setParentFolderToken: (parentFolderToken: string) => void;
+    setParentFolderToken: (parentFolderToken: string | null) => void;
   };
   createFolderRequest: () => void;
   addSingleFolderToList: (data: unknown) => void;
@@ -49,7 +49,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
             pathName: pathName,
           },
         })),
-      setParentFolderToken: (parentFolderToken: string) =>
+      setParentFolderToken: (parentFolderToken: string | null) =>
         set((state) => ({
           ...state,
           createFolder: {

@@ -10,12 +10,16 @@ import { Input } from './ui/input';
 import { ICreatedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
 import { useActionCable } from '@/hooks/useActionCable';
 import { FOLDER_CREATED } from '@/constants/socketActions';
+import { getAuthTokenCookie } from '@/lib/cookie';
 
 const CreateFolder = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const { id } = useParams();
   const { createFolder, createFolderRequest, addSingleFolderToList } = useFoldersStore();
-  const { subscription, receivedData } = useActionCable('FolderChannel');
+  const { subscription, receivedData } = useActionCable(
+    'FolderChannel',
+    String(getAuthTokenCookie())
+  );
 
   useEffect(() => {
     subscription;
@@ -23,7 +27,7 @@ const CreateFolder = () => {
 
   useEffect(() => {
     // Set token same as in URL params token
-    id && useFoldersStore.getState().createFolder.setParentFolderToken(id);
+    useFoldersStore.getState().createFolder.setParentFolderToken(id ?? null);
   }, [id]);
 
   useEffect(() => {
@@ -31,8 +35,14 @@ const CreateFolder = () => {
     const isFolderCreateAction =
       responseData && responseData.action === FOLDER_CREATED;
 
-    if (isFolderCreateAction && createFolder.parentFolderToken === id) {
-      addSingleFolderToList(responseData);
+    if (isFolderCreateAction) {
+      const parentFolderId = responseData.data[0].parent_folder_id;
+
+      if (createFolder.parentFolderToken === id && parentFolderId !== null) {
+        addSingleFolderToList(responseData);
+      } else if (createFolder.parentFolderToken === null && parentFolderId === null) {
+        addSingleFolderToList(responseData);
+      }
     }
   }, [receivedData, addSingleFolderToList, id, createFolder.parentFolderToken]);
 
@@ -49,8 +59,11 @@ const CreateFolder = () => {
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <div className="w-full flex justify-end">
-        <DialogTrigger className="p-2 bg-white hover:bg-black hover:bg-opacity-10">
+      <div className="w-10">
+        <DialogTrigger
+          className="p-2 bg-white hover:bg-black hover:bg-opacity-10"
+          title="Create Folder"
+        >
           <FolderPlus color={'black'} size={'25px'} />
         </DialogTrigger>
       </div>
@@ -59,6 +72,8 @@ const CreateFolder = () => {
         <Input onChange={handlePathInput} />
         <div className="w-full flex justify-end mt-2">
           <Button
+            type="button"
+            variant={'ghost'}
             className="mr-4"
             onClick={() => {
               setOpenDialog(false);

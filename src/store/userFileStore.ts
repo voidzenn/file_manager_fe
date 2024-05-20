@@ -3,19 +3,46 @@ import { create } from 'zustand';
 import { useAuthStore } from './useAuthStore';
 
 import { IFileData, IFileListResponse } from '@/apis/file/fileInterface';
-import { FILE_LIST_API } from '@/constants/apis';
+import { FILE_LIST_API, UPLOAD_FILE_API } from '@/constants/apis';
 import { AxiosResponse } from 'axios';
+
+export interface ICreatedFileSocketData {
+  action: string;
+  data: [
+    {
+      id: number | null;
+      unique_token: string | null;
+      name: string | null;
+      filename: string | null;
+      file_extension: string | null;
+      folder_id: number | null;
+      created_at: string;
+    }
+  ];
+}
 
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
+  addFileToFileList: (data: unknown) => void;
+  uploadFile: {
+    folderUniqueToken: string | null;
+    setFolderUniqueToken: (token: string | null) => void;
+    request: (files: FileList) => void;
+  };
 }
 
-export const useFileStore = create<IFile>((set) => {
+export const useFileStore = create<IFile>((set, getState) => {
   const initialState = {
     files: [],
     getFileList: () => null,
-  }
+    addFileToFileList: () => null,
+    uploadFile: {
+      folderUniqueToken: '',
+      setFolderUniqueToken: () => null,
+      request: () => null,
+    },
+  };
 
   return {
     ...initialState,
@@ -23,7 +50,7 @@ export const useFileStore = create<IFile>((set) => {
     getFileList: async (uniqueToken?: string) => {
       const url = !uniqueToken
         ? FILE_LIST_API
-        : FILE_LIST_API + `?unique_token=${uniqueToken}`;
+        : FILE_LIST_API + `?folder_unique_token=${uniqueToken}`;
 
       await useAuthStore.getState().api.getRequest(url);
 
@@ -35,6 +62,45 @@ export const useFileStore = create<IFile>((set) => {
         ...state,
         files: files,
       }));
+    },
+
+    addFileToFileList: (data: unknown) => {
+      const responseData = data as ICreatedFileSocketData;
+
+      set((state) => ({
+        ...state,
+        files: [responseData?.data[0], ...state.files],
+      }));
+    },
+
+    uploadFile: {
+      setFolderUniqueToken: (token: string | null) =>
+        set((state) => ({
+          ...state,
+          uploadFile: {
+            ...state.uploadFile,
+            folderUniqueToken: token,
+          },
+        })),
+
+      request: async (files: FileList) => {
+        const formData = new FormData();
+        const headerOptions = {
+          'Content-Type': 'multipart/form-data',
+        };
+
+        const folderToken = getState().uploadFile.folderUniqueToken;
+
+        if (folderToken) {
+          formData.append('data[folder_unique_token]', folderToken);
+        }
+
+        formData.append('data[file_upload]', files[0]);
+
+        useAuthStore
+          .getState()
+          .api.postRequest(UPLOAD_FILE_API, formData, headerOptions);
+      },
     },
   };
 });
