@@ -1,10 +1,10 @@
 import { create } from 'zustand';
+import { AxiosResponse } from 'axios';
 
 import { useAuthStore } from './useAuthStore';
 
-import { IFileData, IFileListResponse } from '@/apis/file/fileInterface';
-import { FILE_LIST_API, UPLOAD_FILE_API } from '@/constants/apis';
-import { AxiosResponse } from 'axios';
+import { IFileData, IFileListResponse, IFileUrlResponse } from '@/apis/file/fileInterface';
+import { FILES_BASE_API, FILES_GET_URL_API } from '@/constants/apis';
 
 export interface ICreatedFileSocketData {
   action: string;
@@ -24,6 +24,7 @@ export interface ICreatedFileSocketData {
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
+  getFileUrl: (uniqueToken: string) => IFileUrlResponse;
   addFileToFileList: (data: unknown) => void;
   uploadFile: {
     folderUniqueToken: string | null;
@@ -36,6 +37,7 @@ export const useFileStore = create<IFile>((set, getState) => {
   const initialState = {
     files: [],
     getFileList: () => null,
+    getFileUrl: () => null,
     addFileToFileList: () => null,
     uploadFile: {
       folderUniqueToken: '',
@@ -49,8 +51,8 @@ export const useFileStore = create<IFile>((set, getState) => {
 
     getFileList: async (uniqueToken?: string) => {
       const url = !uniqueToken
-        ? FILE_LIST_API
-        : FILE_LIST_API + `?folder_unique_token=${uniqueToken}`;
+        ? FILES_BASE_API
+        : FILES_BASE_API + `?folder_unique_token=${uniqueToken}`;
 
       await useAuthStore.getState().api.getRequest(url);
 
@@ -62,6 +64,19 @@ export const useFileStore = create<IFile>((set, getState) => {
         ...state,
         files: files,
       }));
+    },
+
+    getFileUrl: async(uniqueToken: string) => {
+      const url = !uniqueToken
+        ? FILES_GET_URL_API
+        : FILES_GET_URL_API + `?unique_token=${uniqueToken}`;
+
+      await useAuthStore.getState().api.getRequest(url);
+
+      const response = useAuthStore.getState().api.data as AxiosResponse;
+      const responseData = response.data as IFileListResponse;
+
+      return responseData;
     },
 
     addFileToFileList: (data: unknown) => {

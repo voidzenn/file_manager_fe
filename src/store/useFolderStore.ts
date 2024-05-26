@@ -6,7 +6,7 @@ import {
   IFolderData,
   IFolderListResponse
 } from '@/apis/folder/folderInterface';
-import { FOLDER_CREATE_API, FOLDER_LIST_API } from '@/constants/apis';
+import { FOLDERS_BASE_API } from '@/constants/apis';
 
 interface IFolder {
   folders: [IFolderData] | [];
@@ -68,8 +68,8 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
 
     getFoldersList: async (uniqueToken?: string) => {
       const url = !uniqueToken
-        ? FOLDER_LIST_API
-        : FOLDER_LIST_API + `?unique_token=${uniqueToken}`;
+        ? FOLDERS_BASE_API
+        : FOLDERS_BASE_API + `?unique_token=${uniqueToken}`;
 
       await useAuthStore.getState().api.getRequest(url);
 
@@ -91,7 +91,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
         },
       };
 
-      await useAuthStore.getState().api.postRequest(FOLDER_CREATE_API, newData);
+      await useAuthStore.getState().api.postRequest(FOLDERS_BASE_API, newData);
     },
 
     addSingleFolderToList(data: unknown) {
