@@ -14,5 +14,7 @@ export interface IFileListResponse {
 export interface IFileUrlResponse {
   data: {
     file_url: string;
+    file_name: string;
+    file_extension: string;
   }
 }

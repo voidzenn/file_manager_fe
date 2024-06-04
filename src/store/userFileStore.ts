@@ -114,7 +114,7 @@ export const useFileStore = create<IFile>((set, getState) => {
 
         useAuthStore
           .getState()
-          .api.postRequest(UPLOAD_FILE_API, formData, headerOptions);
+          .api.postRequest(FILES_BASE_API, formData, headerOptions);
       },
     },
   };

@@ -3,9 +3,10 @@ import { useState } from 'react';
 import FileView from './FileView';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
-import { File, Image, Video } from 'lucide-react';
+import { File, FileX, Image, Video } from 'lucide-react';
 
 import { useFileStore } from '@/store/userFileStore';
+import { useFileExtensionCheck } from '@/hooks/useFileExtensionCheck';
 
 import { IFileData, IFileUrlResponse } from '@/apis/file/fileInterface';
 
@@ -17,30 +18,34 @@ interface FileLogoProp {
   file_extension: string | null;
 }
 
-const FileLogo = ({ file_extension }: FileLogoProp) => {
-  const logoSize = '20px';
-  const imageFormat = ['jpg', 'png'];
-  const videoFormat = ['mp4'];
-
-  if (!file_extension) {
-    return <File size={logoSize} />;
-  }
-
-  if (imageFormat.includes(file_extension)) {
-    return <Image size={logoSize} />;
-  } else if (videoFormat.includes(file_extension)) {
-    return <Video size={logoSize} />;
-  }
-};
-
 const FileList = ({ files }: IProps) => {
-  const [imgUrl, setImgUrl] = useState<string>('');
+  const [sourceUrl, setSourceUrl] = useState<string>('');
+  const [fileName, setFileName] = useState<string>('');
+  const [fileExtension, setFileExtension] = useState<string>('');
   const { getFileUrl } = useFileStore();
+  const { isFileImage, isFileVideo, isFileDocument } = useFileExtensionCheck();
+
+  const FileLogo = ({ file_extension }: FileLogoProp) => {
+    const logoSize = '20px';
+    const ext = String(file_extension);
+
+    if (isFileImage(ext)) {
+      return <Image size={logoSize} />;
+    } else if (isFileVideo(ext)) {
+      return <Video size={logoSize} />;
+    } else if (isFileDocument(ext)) {
+      return <File size={logoSize} />;
+    } else {
+      return <FileX size={logoSize} />;
+    }
+  };
 
   const handleFileClick = async (uniqueToken: string) => {
     const response = await getFileUrl(uniqueToken) as IFileUrlResponse;
 
-    setImgUrl(response.data.file_url);
+    setSourceUrl(response.data.file_url);
+    setFileName(response.data.file_name);
+    setFileExtension(response.data.file_extension);
   }
 
   return (
@@ -66,7 +71,11 @@ const FileList = ({ files }: IProps) => {
           )}
         </DialogTrigger>
         <DialogContent>
-          <FileView imgUrl={imgUrl} />
+          <FileView
+            sourceUrl={sourceUrl}
+            fileExtension={fileExtension}
+            fileName={fileName}
+          />
         </DialogContent>
       </Dialog>
     </>
