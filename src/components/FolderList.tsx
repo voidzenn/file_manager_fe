@@ -1,11 +1,13 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Label } from './ui/label';
-import { Folder } from 'lucide-react';
+import { Folder, LucideMoreVertical } from 'lucide-react';
 
 import { IFolderData } from '@/apis/folder/folderInterface';
 import { ROUTES } from '@/constants/routes';
 import { Button } from './ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import DropdownOption from './DropdownOption';
 
 interface IProps {
   folders: [IFolderData] | [];
@@ -19,6 +21,11 @@ const FolderList = ({ folders }: IProps) => {
     navigate(ROUTES.folders + `/${uniqueToken}`, { state: { uniqueToken: uniqueToken } });
   };
 
+  const handleFolderLabelClick = (e) => {
+    e.stopPropagation();
+    alert('test');
+  }
+
   return (
     <div className="flex flex-col">
       <div className="min-h-10 w-full mt-5">
@@ -27,7 +34,11 @@ const FolderList = ({ folders }: IProps) => {
             className="w-full justify-start bg-white hover:bg-black hover:bg-opacity-10"
             onClick={() => navigate(-1)}
           >
-            <Label className="text-black">...</Label>
+            <Label
+              className="text-black"
+            >
+              ...
+            </Label>
           </Button>
         )}
       </div>
@@ -35,12 +46,37 @@ const FolderList = ({ folders }: IProps) => {
       {folders.map(({ unique_token, path, parentFolderId }: IFolderData) => {
         return (
           <div
-            className="flex gap-5 px-2 py-3 hover:cursor-pointer hover:bg-black hover:bg-opacity-5"
+            className="flex gap-5 px-2 py-3 hover:bg-black hover:bg-opacity-5"
             key={unique_token}
             onClick={() => handleFolderClick(String(unique_token))}
           >
             <Folder size={'20px'} />
-            <Label className="text-md"> {path} </Label>
+            <Label className="text-md">{path}</Label>
+            <Popover>
+              <PopoverTrigger
+                asChild
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <LucideMoreVertical
+                  className="absolute right-16 mt-[-2px] hover:bg-black hover:bg-opacity-10"
+                  size={'20px'}
+                  width={'25px'}
+                  height={'30px'}
+                />
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                side="left"
+                className="w-full m-0 p-0 bg-white border-2 border-black border-opacity-15 border-rounded z-10"
+              >
+                <DropdownOption
+                  object_id={String(unique_token)}
+                  object_name={String(path)}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         );
       })}
