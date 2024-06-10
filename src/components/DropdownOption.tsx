@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+import { useFoldersStore } from "@/store/useFolderStore";
+
 interface IProps {
   object_id: string;
   object_name: string;
@@ -13,8 +15,18 @@ interface IProps {
 const DropdownOption = ({ object_id, object_name }: IProps) => {
   const [openRenameDialog, setOpenRenameDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const { renameFolder, renameFolderRequest } = useFoldersStore();
 
-  const handleInput = () => {
+  const handleInput = (e) => {
+    const value = e.target.value;
+
+    renameFolder.setNewPathName(value);
+  }
+
+  const handleRename = async () => {
+    renameFolder.setUniqueToken(object_id);
+
+    await renameFolderRequest();
   }
 
   return (
@@ -38,6 +50,7 @@ const DropdownOption = ({ object_id, object_name }: IProps) => {
             </Button>
             <Button
               className="w-20"
+              onClick={handleRename}
             >
               Rename
             </Button>

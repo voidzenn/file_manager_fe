@@ -63,7 +63,8 @@ interface IAuth {
     data: unknown;
     error: unknown;
     getRequest: (path: string) => void;
-    postRequest: (path:string, data?: unknown, options?: unknown) => void;
+    postRequest: (path: string, data?: unknown, options?: unknown) => void;
+    putRequest: (path: string, data?: unknown, options?: unknown) => void;
   };
 }
 
@@ -105,7 +106,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
       data: {},
       error: {},
       getRequest: () => null,
-      postRequest: () => null
+      putRequest: () => null,
     },
   };
 
@@ -324,28 +325,23 @@ export const useAuthStore = create<IAuth>((set, getState) => {
         return await axiosConfig
           .post(path, data, { headers: headers })
           .then((data: AxiosResponse) => {
-            // set((state) => ({
-            //   ...state,
-            //   api: {
-            //     ...state.api,
-            //     data: data,
-            //   },
-            // }));
             return data;
           })
           .catch((error: AxiosError) => {
-            // if (error.response?.status === API_RESPONSE_CODE.unauthorized) {
-            //   getState().refreshToken.request();
-            // } else {
-            //   set((state) => ({
-            //     ...state,
-            //     api: {
-            //       ...state.api,
-            //       error: error,
-            //     },
-            //   }));
-            //   return error;
-            // }
+            return error;
+          });
+      },
+      putRequest: async (path: string, data?: unknown, options?: unknown) => {
+        const headers = getState().auth.getHeaderToken();
+
+        options && Object.assign(headers, options);
+
+        return await axiosConfig
+          .put(path, data, { headers: headers })
+          .then((data: AxiosResponse) => {
+            return data;
+          })
+          .catch((error: AxiosError) => {
             return error;
           });
       },

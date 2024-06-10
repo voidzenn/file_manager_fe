@@ -9,6 +9,8 @@ import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import DropdownOption from './DropdownOption';
 
+import { useFoldersStore } from '@/store/useFolderStore';
+
 interface IProps {
   folders: [IFolderData] | [];
 }
@@ -16,6 +18,7 @@ interface IProps {
 const FolderList = ({ folders }: IProps) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { renameFolder } = useFoldersStore();
 
   const handleFolderClick = (uniqueToken: string) => {
     navigate(ROUTES.folders + `/${uniqueToken}`, { state: { uniqueToken: uniqueToken } });
@@ -57,6 +60,7 @@ const FolderList = ({ folders }: IProps) => {
                 asChild
                 onClick={(e) => {
                   e.stopPropagation();
+                  renameFolder.setUniqueToken(String(unique_token));
                 }}
               >
                 <LucideMoreVertical
