@@ -36,7 +36,7 @@ const CreateFolder = () => {
       responseData && responseData.action === FOLDER_CREATED;
 
     if (isFolderCreateAction) {
-      const parentFolderId = responseData.data[0].parent_folder_id;
+      const parentFolderId = responseData.data[0]?.parent_folder_id || null;
 
       if (createFolder.parentFolderToken === id && parentFolderId !== null) {
         addSingleFolderToList(responseData);

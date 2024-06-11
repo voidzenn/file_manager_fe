@@ -28,10 +28,24 @@ interface IFolder {
     setParentFolderToken: (parentFolderToken: string | null) => void;
   };
   renameFolderRequest: () => void;
+  updateFolderPath: (data: unknown) => void;
 }
 
 export interface ICreatedFolderSocketData {
   action: string,
+  data: [
+    {
+      id: number;
+      unique_token: string;
+      path: string;
+      parent_folder_id: number;
+      created_at: string;
+    }
+  ];
+}
+
+export interface IRenamedFolderSocketData {
+  action: string;
   data: [
     {
       id: number;
@@ -90,7 +104,8 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
           },
         })),
     },
-    renameFolderRequest: () => null
+    renameFolderRequest: () => null,
+    updateFolderPath: () => null
   };
 
   return {
@@ -144,6 +159,22 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
       await useAuthStore
         .getState()
         .api.putRequest(FOLDERS_RENAME_API, bodyData);
+    },
+
+    updateFolderPath: async (data: unknown) => {
+      const responseData = data as IRenamedFolderSocketData;
+
+      set((state) => ({
+        ...state,
+        folders: state.folders.map((obj) => {
+          if (obj.unique_token === responseData?.data[0].unique_token) {
+            obj.path = responseData?.data[0].path;
+            return obj;
+          }
+
+          return obj;
+        }),
+      }));
     },
   };
 });

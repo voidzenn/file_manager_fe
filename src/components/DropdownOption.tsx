@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
@@ -15,6 +15,7 @@ interface IProps {
 const DropdownOption = ({ object_id, object_name }: IProps) => {
   const [openRenameDialog, setOpenRenameDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [disableRenameBtn, setDisableRenameBtn] = useState<boolean>(true);
   const { renameFolder, renameFolderRequest } = useFoldersStore();
 
   const handleInput = (e) => {
@@ -27,16 +28,39 @@ const DropdownOption = ({ object_id, object_name }: IProps) => {
     renameFolder.setUniqueToken(object_id);
 
     await renameFolderRequest();
+
+    setOpenRenameDialog(false);
   }
+
+  useEffect(() => {
+    if (
+      renameFolder.newPathName?.length === 0 ||
+      renameFolder.newPathName === null ||
+      renameFolder.newPathName === object_name
+    ) {
+      setDisableRenameBtn(true);
+    } else {
+      setDisableRenameBtn(false);
+    }
+  }, [
+    renameFolder.newPathName,
+    setDisableRenameBtn,
+    disableRenameBtn,
+    object_name,
+  ]);
 
   return (
     <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>
-      <Dialog>
+      <Dialog open={openRenameDialog} onOpenChange={setOpenRenameDialog}>
         <DialogTrigger className="p-2 hover:bg-black hover:bg-opacity-20">
           <Label>Rename</Label>
         </DialogTrigger>
         <DialogContent>
-          <Input className="mt-5" onChange={handleInput} defaultValue={object_name} />
+          <Input
+            className="mt-5"
+            onChange={handleInput}
+            defaultValue={object_name}
+          />
           <div className="w-full flex justify-end mt-2">
             <Button
               type="button"
@@ -51,6 +75,7 @@ const DropdownOption = ({ object_id, object_name }: IProps) => {
             <Button
               className="w-20"
               onClick={handleRename}
+              disabled={disableRenameBtn}
             >
               Rename
             </Button>
