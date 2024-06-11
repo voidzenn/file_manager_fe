@@ -6,7 +6,7 @@ import {
   IFolderData,
   IFolderListResponse
 } from '@/apis/folder/folderInterface';
-import { FOLDERS_BASE_API } from '@/constants/apis';
+import { FOLDERS_BASE_API, FOLDERS_RENAME_API } from '@/constants/apis';
 
 interface IFolder {
   folders: [IFolderData] | [];
@@ -19,10 +19,33 @@ interface IFolder {
   };
   createFolderRequest: () => void;
   addSingleFolderToList: (data: unknown) => void;
+  renameFolder: {
+    uniqueToken: string | null,
+    parentFolderToken: string | null;
+    newPathName: string | null;
+    setNewPathName: (newPath: string) => void;
+    setUniqueToken: (uniqueToken: string) => void;
+    setParentFolderToken: (parentFolderToken: string | null) => void;
+  };
+  renameFolderRequest: () => void;
+  updateFolderPath: (data: unknown) => void;
 }
 
 export interface ICreatedFolderSocketData {
   action: string,
+  data: [
+    {
+      id: number;
+      unique_token: string;
+      path: string;
+      parent_folder_id: number;
+      created_at: string;
+    }
+  ];
+}
+
+export interface IRenamedFolderSocketData {
+  action: string;
   data: [
     {
       id: number;
@@ -40,6 +63,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     getFolderList: () => null,
     createFolder: {
       pathName: '',
+      uniqueToken: '',
       parentFolderToken: null,
       setPathName: (pathName: string) =>
         set((state) => ({
@@ -54,13 +78,43 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
           ...state,
           createFolder: {
             ...state.createFolder,
-            parentFolderToken: parentFolderToken
+            parentFolderToken: parentFolderToken,
           },
         })),
       request: () => null,
     },
     createFolderRequest: () => null,
     addSingleFolderToList: () => null,
+    renameFolder: {
+      newPathName: null,
+      parentFolderToken: null,
+      setParentFolderToken: (parentFolderToken: string) =>
+        set((state) => ({
+          ...state,
+          renameFolder: {
+            ...state.renameFolder,
+            parentFolderToken: parentFolderToken,
+          },
+        })),
+      setUniqueToken: (uniqueToken: string) =>
+        set((state) => ({
+          ...state,
+          renameFolder: {
+            ...state.renameFolder,
+            uniqueToken: uniqueToken,
+          },
+        })),
+      setNewPathName: (newPathName: string) =>
+        set((state) => ({
+          ...state,
+          renameFolder: {
+            ...state.renameFolder,
+            newPathName: newPathName,
+          },
+        })),
+    },
+    renameFolderRequest: () => null,
+    updateFolderPath: () => null,
   };
 
   return {
@@ -86,8 +140,8 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     createFolderRequest: async () => {
       const newData = {
         folder: {
-          path: getState().createFolder.pathName + '/',
-          parent_unique_token: getState().createFolder.parentFolderToken
+          path: getState().createFolder.pathName + "/",
+          parent_unique_token: getState().createFolder.parentFolderToken,
         },
       };
 
@@ -99,8 +153,42 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
 
       set((state) => ({
         ...state,
-        folders: [responseData?.data[0], ...state.folders]
+        folders: [responseData?.data[0], ...state.folders],
       }));
-    }
+    },
+
+    renameFolderRequest: async () => {
+      const bodyData = {
+        folder: {
+          unique_token: getState().renameFolder.uniqueToken,
+          new_path: getState().renameFolder.newPathName + "/",
+        },
+      };
+      const parentFolderToken = getState().renameFolder.parentFolderToken;
+
+      if (parentFolderToken !== '' && parentFolderToken !== null) {
+        Object.assign(bodyData, { parent_unique_token: parentFolderToken });
+      }
+
+      await useAuthStore
+        .getState()
+        .api.putRequest(FOLDERS_RENAME_API, bodyData);
+    },
+
+    updateFolderPath: async (data: unknown) => {
+      const responseData = data as IRenamedFolderSocketData;
+
+      set((state) => ({
+        ...state,
+        folders: state.folders.map((obj) => {
+          if (obj.unique_token === responseData?.data[0].unique_token) {
+            obj.path = responseData?.data[0].path;
+            return obj;
+          }
+
+          return obj;
+        }),
+      }));
+    },
   };
 });
