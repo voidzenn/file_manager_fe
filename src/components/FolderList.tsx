@@ -44,17 +44,7 @@ const FolderList = ({ folders }: IProps) => {
       responseData && responseData.action === FOLDER_RENAMED;
 
     if (isFolderRenamedAction) {
-      const parentFolderId = responseData.data[0]?.parent_folder_id || null;
-
-      if (renameFolder.parentFolderToken === id && parentFolderId !== null) {
-        updateFolderPath(responseData);
-      } else if (
-        renameFolder.parentFolderToken === null &&
-        parentFolderId === null
-      ) {
-        console.log("test");
-        updateFolderPath(responseData);
-      }
+      updateFolderPath(responseData);
     }
   }, [receivedData, updateFolderPath, id, renameFolder.parentFolderToken]);
 
@@ -101,6 +91,7 @@ const FolderList = ({ folders }: IProps) => {
                 className="w-full m-0 p-0 bg-white border-2 border-black border-opacity-15 border-rounded z-10"
               >
                 <DropdownOption
+                  object_parent_id={id}
                   object_id={String(unique_token)}
                   object_name={String(path)}
                 />

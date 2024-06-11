@@ -88,13 +88,22 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     renameFolder: {
       newPathName: null,
       parentFolderToken: null,
-      setUniqueToken: (uniqueToken : string) => set((state) => ({
-        ...state,
+      setParentFolderToken: (parentFolderToken: string) =>
+        set((state) => ({
+          ...state,
           renameFolder: {
             ...state.renameFolder,
-            uniqueToken: uniqueToken
-          }
-      })),
+            parentFolderToken: parentFolderToken,
+          },
+        })),
+      setUniqueToken: (uniqueToken: string) =>
+        set((state) => ({
+          ...state,
+          renameFolder: {
+            ...state.renameFolder,
+            uniqueToken: uniqueToken,
+          },
+        })),
       setNewPathName: (newPathName: string) =>
         set((state) => ({
           ...state,
@@ -105,7 +114,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
         })),
     },
     renameFolderRequest: () => null,
-    updateFolderPath: () => null
+    updateFolderPath: () => null,
   };
 
   return {
@@ -155,6 +164,11 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
           new_path: getState().renameFolder.newPathName + "/",
         },
       };
+      const parentFolderToken = getState().renameFolder.parentFolderToken;
+
+      if (parentFolderToken !== '' && parentFolderToken !== null) {
+        Object.assign(bodyData, { parent_unique_token: parentFolderToken });
+      }
 
       await useAuthStore
         .getState()

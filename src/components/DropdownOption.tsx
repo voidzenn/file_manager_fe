@@ -9,10 +9,11 @@ import { useFoldersStore } from "@/store/useFolderStore";
 
 interface IProps {
   object_id: string;
+  object_parent_id?: string;
   object_name: string;
 }
 
-const DropdownOption = ({ object_id, object_name }: IProps) => {
+const DropdownOption = ({ object_parent_id, object_id, object_name }: IProps) => {
   const [openRenameDialog, setOpenRenameDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [disableRenameBtn, setDisableRenameBtn] = useState<boolean>(true);
@@ -25,6 +26,7 @@ const DropdownOption = ({ object_id, object_name }: IProps) => {
   }
 
   const handleRename = async () => {
+    renameFolder.setParentFolderToken(String(object_parent_id));
     renameFolder.setUniqueToken(object_id);
 
     await renameFolderRequest();
