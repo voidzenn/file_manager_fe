@@ -107,10 +107,10 @@ export const useFileStore = create<IFile>((set, getState) => {
         const folderToken = getState().uploadFile.folderUniqueToken;
 
         if (folderToken) {
-          formData.append('data[folder_unique_token]', folderToken);
+          formData.append('file_upload[folder_unique_token]', folderToken);
         }
 
-        formData.append('data[file_upload]', files[0]);
+        formData.append('file_upload[file_upload]', files[0]);
 
         useAuthStore
           .getState()
