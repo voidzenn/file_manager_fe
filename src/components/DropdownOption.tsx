@@ -6,23 +6,30 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 import { useFoldersStore } from "@/store/useFolderStore";
+import { useFileStore } from "@/store/userFileStore";
 
 interface IProps {
   object_id: string;
   object_parent_id?: string;
   object_name: string;
+  object_type: "folder" | "file";
 }
 
-const DropdownOption = ({ object_parent_id, object_id, object_name }: IProps) => {
+const DropdownOption = ({ object_parent_id, object_id, object_name, object_type }: IProps) => {
   const [openRenameDialog, setOpenRenameDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [disableRenameBtn, setDisableRenameBtn] = useState<boolean>(true);
   const { renameFolder, renameFolderRequest } = useFoldersStore();
+  const { renameFile } = useFileStore();
 
   const handleInput = (e) => {
     const value = e.target.value;
 
-    renameFolder.setNewPathName(value);
+    if(object_type === "folder") {
+      renameFolder.setNewPathName(value);
+    }else {
+      renameFile.setNewPathName(value);
+    }
   }
 
   const handleRename = async () => {
@@ -50,6 +57,14 @@ const DropdownOption = ({ object_parent_id, object_id, object_name }: IProps) =>
     disableRenameBtn,
     object_name,
   ]);
+
+  useEffect(() => {
+    console.log(renameFile.newPathName);
+  }, [renameFile.newPathName]);
+
+  useEffect(() => {
+    console.log(object_name);
+  }, []);
 
   return (
     <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>

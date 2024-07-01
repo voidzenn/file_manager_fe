@@ -31,6 +31,13 @@ interface IFile {
     setFolderUniqueToken: (token: string | null) => void;
     request: (files: FileList) => void;
   };
+  renameFile: {
+    newPathName: string | null;
+    folderUniqueToken: string | null;
+    setNewPathName: (newPath: string) => void;
+    setFolderUniqueToken: (token: string | null) => void;
+    request: (file_token: string) => void;
+  };
 }
 
 export const useFileStore = create<IFile>((set, getState) => {
@@ -44,6 +51,13 @@ export const useFileStore = create<IFile>((set, getState) => {
       setFolderUniqueToken: () => null,
       request: () => null,
     },
+    renameFile: {
+      newPathName: "",
+      folderUniqueToken: "",
+      setNewPathName: () => null,
+      setFolderUniqueToken: () => null,
+      request: () => null,
+    }
   };
 
   return {
@@ -66,7 +80,7 @@ export const useFileStore = create<IFile>((set, getState) => {
       }));
     },
 
-    getFileUrl: async(uniqueToken: string) => {
+    getFileUrl: async (uniqueToken: string) => {
       const url = !uniqueToken
         ? FILES_GET_URL_API
         : FILES_GET_URL_API + `?unique_token=${uniqueToken}`;
@@ -103,7 +117,6 @@ export const useFileStore = create<IFile>((set, getState) => {
         const headerOptions = {
           'Content-Type': 'multipart/form-data',
         };
-
         const folderToken = getState().uploadFile.folderUniqueToken;
 
         if (folderToken) {
@@ -115,6 +128,39 @@ export const useFileStore = create<IFile>((set, getState) => {
         useAuthStore
           .getState()
           .api.postRequest(FILES_BASE_API, formData, headerOptions);
+      },
+    },
+
+    renameFile: {
+      setNewPathName: (newPathName: string) => {
+        set((state) => ({
+          ...state,
+          renameFile: {
+            ...state.renameFile,
+            newPathName: newPathName,
+          },
+        }))
+      },
+
+      setFolderUniqueToken: (token: string | null) => {
+        set((state) => ({
+          ...state,
+          renameFile: {
+            ...state.renameFile,
+            folderUniqueToken: token,
+          },
+        }));
+      },
+
+      request: async (file_token: string) => {
+        const folderToken = getState().uploadFile.folderUniqueToken;
+        const bodyData = {
+          folder: {
+            unique_token: file_token,
+          },
+        };
+
+        useAuthStore.getState().api.postRequest(FILES_BASE_API, formData);
       },
     },
   };

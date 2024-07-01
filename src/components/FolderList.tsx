@@ -94,6 +94,7 @@ const FolderList = ({ folders }: IProps) => {
                   object_parent_id={id}
                   object_id={String(unique_token)}
                   object_name={String(path)}
+                  object_type="folder"
                 />
               </PopoverContent>
             </Popover>

@@ -1,14 +1,17 @@
 import { useState } from 'react';
+import { File, FileX, Image, LucideMoreVertical, Video } from 'lucide-react';
 
 import FileView from './FileView';
 import { Label } from './ui/label';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
-import { File, FileX, Image, Video } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import DropdownOption from './DropdownOption';
 
 import { useFileStore } from '@/store/userFileStore';
 import { useFileExtensionCheck } from '@/hooks/useFileExtensionCheck';
 
 import { IFileData, IFileUrlResponse } from '@/apis/file/fileInterface';
+
 
 interface IProps {
   files: [IFileData] | [];
@@ -65,6 +68,32 @@ const FileList = ({ files }: IProps) => {
                   <Label className="text-md">
                     {filename + '.' + file_extension}
                   </Label>
+                  <Popover>
+                    <PopoverTrigger
+                      asChild
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <LucideMoreVertical
+                        className="absolute right-16 mt-[-2px] hover:bg-black hover:bg-opacity-10"
+                        size={'20px'}
+                        width={'25px'}
+                        height={'30px'}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="start"
+                      side="left"
+                      className="w-full m-0 p-0 bg-white border-2 border-black border-opacity-15 border-rounded z-10"
+                    >
+                      <DropdownOption
+                        object_id={String(unique_token)}
+                        object_name={filename}
+                        object_type="file"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               );
             }
