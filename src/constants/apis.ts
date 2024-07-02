@@ -5,3 +5,4 @@ export const FOLDERS_BASE_API = '/folders';
 export const FOLDERS_RENAME_API = '/folders/rename';
 export const FILES_BASE_API = '/file_uploads';
 export const FILES_GET_URL_API = '/file_uploads/view_file';
+export const FILE_RENAME_API = '/file_uploads/rename';

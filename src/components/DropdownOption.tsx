@@ -42,29 +42,36 @@ const DropdownOption = ({ object_parent_id, object_id, object_name, object_type 
   }
 
   useEffect(() => {
-    if (
-      renameFolder.newPathName?.length === 0 ||
-      renameFolder.newPathName === null ||
-      renameFolder.newPathName === object_name
-    ) {
-      setDisableRenameBtn(true);
-    } else {
-      setDisableRenameBtn(false);
+    if(object_type === 'folder') {
+      if (
+        renameFolder.newPathName?.length === 0 ||
+        renameFolder.newPathName === null ||
+        renameFolder.newPathName === object_name
+      ) {
+        setDisableRenameBtn(true);
+      } else {
+        setDisableRenameBtn(false);
+      }
+    }
+
+    if (object_type === 'file') {
+      if (
+        renameFile.newPathName?.length !== 0 &&
+        renameFile.newPathName !== null && renameFile.newPathName !== undefined &&
+        renameFile.newPathName !== object_name
+      ) {
+        setDisableRenameBtn(false);
+      } else {
+        setDisableRenameBtn(true);
+      }
     }
   }, [
+    object_type,
     renameFolder.newPathName,
+    renameFile.newPathName,
     setDisableRenameBtn,
-    disableRenameBtn,
     object_name,
   ]);
-
-  useEffect(() => {
-    console.log(renameFile.newPathName);
-  }, [renameFile.newPathName]);
-
-  useEffect(() => {
-    console.log(object_name);
-  }, []);
 
   return (
     <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>

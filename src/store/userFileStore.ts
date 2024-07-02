@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios';
 import { useAuthStore } from './useAuthStore';
 
 import { IFileData, IFileListResponse, IFileUrlResponse } from '@/apis/file/fileInterface';
-import { FILES_BASE_API, FILES_GET_URL_API } from '@/constants/apis';
+import { FILES_BASE_API, FILES_GET_URL_API, FILE_RENAME_API } from '@/constants/apis';
 
 export interface ICreatedFileSocketData {
   action: string;
@@ -160,7 +160,15 @@ export const useFileStore = create<IFile>((set, getState) => {
           },
         };
 
-        useAuthStore.getState().api.postRequest(FILES_BASE_API, formData);
+        if (folderToken !== null) {
+          const folderUniqueToken = {
+            folder_unique_token: folderToken
+          }
+
+          Object.assign(bodyData, folderUniqueToken)
+        }
+
+        useAuthStore.getState().api.postRequest(FILE_RENAME_API, bodyData);
       },
     },
   };
