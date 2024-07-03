@@ -33,10 +33,16 @@ const DropdownOption = ({ object_parent_id, object_id, object_name, object_type 
   }
 
   const handleRename = async () => {
-    renameFolder.setParentFolderToken(String(object_parent_id));
-    renameFolder.setUniqueToken(object_id);
+    if(object_type === "folder") {
+      renameFolder.setParentFolderToken(String(object_parent_id));
+      renameFolder.setUniqueToken(object_id);
 
-    await renameFolderRequest();
+      await renameFolderRequest();
+    }
+
+    if (object_type === 'file') {
+      await renameFile.request(object_id);
+    }
 
     setOpenRenameDialog(false);
   }

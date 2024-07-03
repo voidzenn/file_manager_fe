@@ -89,7 +89,7 @@ const FileList = ({ files }: IProps) => {
                     >
                       <DropdownOption
                         object_id={String(unique_token)}
-                        object_name={filename}
+                        object_name={String(filename)}
                         object_type="file"
                       />
                     </PopoverContent>

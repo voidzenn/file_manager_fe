@@ -153,10 +153,11 @@ export const useFileStore = create<IFile>((set, getState) => {
       },
 
       request: async (file_token: string) => {
-        const folderToken = getState().uploadFile.folderUniqueToken;
+        const folderToken = getState().renameFile.folderUniqueToken;
         const bodyData = {
-          folder: {
+          file_upload: {
             unique_token: file_token,
+            new_name: getState().renameFile.newPathName
           },
         };
 
@@ -168,7 +169,7 @@ export const useFileStore = create<IFile>((set, getState) => {
           Object.assign(bodyData, folderUniqueToken)
         }
 
-        useAuthStore.getState().api.postRequest(FILE_RENAME_API, bodyData);
+        useAuthStore.getState().api.putRequest(FILE_RENAME_API, bodyData);
       },
     },
   };
