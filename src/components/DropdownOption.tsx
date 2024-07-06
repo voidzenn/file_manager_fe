@@ -10,12 +10,15 @@ import { useFileStore } from "@/store/userFileStore";
 
 interface IProps {
   object_id: string;
-  object_parent_id?: string;
   object_name: string;
   object_type: "folder" | "file";
 }
 
-const DropdownOption = ({ object_parent_id, object_id, object_name, object_type }: IProps) => {
+const DropdownOption = ({
+  object_id,
+  object_name,
+  object_type,
+}: IProps) => {
   const [openRenameDialog, setOpenRenameDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [disableRenameBtn, setDisableRenameBtn] = useState<boolean>(true);
@@ -25,15 +28,15 @@ const DropdownOption = ({ object_parent_id, object_id, object_name, object_type 
   const handleInput = (e) => {
     const value = e.target.value;
 
-    if(object_type === "folder") {
+    if (object_type === 'folder') {
       renameFolder.setNewPathName(value);
-    }else {
+    } else {
       renameFile.setNewPathName(value);
     }
-  }
+  };
 
   const handleRename = async () => {
-    if(object_type === "folder") {
+    if (object_type === 'folder') {
       renameFolder.setParentFolderToken(String(object_parent_id));
       renameFolder.setUniqueToken(object_id);
 
@@ -45,10 +48,10 @@ const DropdownOption = ({ object_parent_id, object_id, object_name, object_type 
     }
 
     setOpenRenameDialog(false);
-  }
+  };
 
   useEffect(() => {
-    if(object_type === 'folder') {
+    if (object_type === 'folder') {
       if (
         renameFolder.newPathName?.length === 0 ||
         renameFolder.newPathName === null ||
@@ -63,7 +66,8 @@ const DropdownOption = ({ object_parent_id, object_id, object_name, object_type 
     if (object_type === 'file') {
       if (
         renameFile.newPathName?.length !== 0 &&
-        renameFile.newPathName !== null && renameFile.newPathName !== undefined &&
+        renameFile.newPathName !== null &&
+        renameFile.newPathName !== undefined &&
         renameFile.newPathName !== object_name
       ) {
         setDisableRenameBtn(false);
@@ -120,6 +124,6 @@ const DropdownOption = ({ object_parent_id, object_id, object_name, object_type 
       </Dialog>
     </div>
   );
-}
+};
 
 export default DropdownOption;

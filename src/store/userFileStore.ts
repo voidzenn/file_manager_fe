@@ -28,14 +28,12 @@ interface IFile {
   addFileToFileList: (data: unknown) => void;
   uploadFile: {
     folderUniqueToken: string | null;
-    setFolderUniqueToken: (token: string | null) => void;
     request: (files: FileList) => void;
   };
   renameFile: {
     newPathName: string | null;
     folderUniqueToken: string | null;
     setNewPathName: (newPath: string) => void;
-    setFolderUniqueToken: (token: string | null) => void;
     request: (file_token: string) => void;
   };
 }
@@ -55,7 +53,6 @@ export const useFileStore = create<IFile>((set, getState) => {
       newPathName: "",
       folderUniqueToken: "",
       setNewPathName: () => null,
-      setFolderUniqueToken: () => null,
       request: () => null,
     }
   };
