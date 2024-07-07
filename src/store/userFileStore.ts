@@ -4,9 +4,24 @@ import { AxiosResponse } from 'axios';
 import { useAuthStore } from './useAuthStore';
 
 import { IFileData, IFileListResponse, IFileUrlResponse } from '@/apis/file/fileInterface';
-import { FILES_BASE_API, FILES_GET_URL_API } from '@/constants/apis';
+import { FILES_BASE_API, FILES_GET_URL_API, FILE_RENAME_API } from '@/constants/apis';
 
 export interface ICreatedFileSocketData {
+  action: string;
+  data: [
+    {
+      id: number | null;
+      unique_token: string | null;
+      name: string | null;
+      filename: string | null;
+      file_extension: string | null;
+      folder_id: number | null;
+      created_at: string;
+    }
+  ];
+}
+
+export interface IRenamedFileSocketData {
   action: string;
   data: [
     {
@@ -28,9 +43,15 @@ interface IFile {
   addFileToFileList: (data: unknown) => void;
   uploadFile: {
     folderUniqueToken: string | null;
-    setFolderUniqueToken: (token: string | null) => void;
     request: (files: FileList) => void;
   };
+  renameFile: {
+    newPathName: string | null;
+    folderUniqueToken: string | null;
+    setNewPathName: (newPath: string) => void;
+    request: (file_token: string) => void;
+  };
+  updateFileName: (data: unknown) => void;
 }
 
 export const useFileStore = create<IFile>((set, getState) => {
@@ -44,6 +65,13 @@ export const useFileStore = create<IFile>((set, getState) => {
       setFolderUniqueToken: () => null,
       request: () => null,
     },
+    renameFile: {
+      newPathName: '',
+      folderUniqueToken: '',
+      setNewPathName: () => null,
+      request: () => null,
+    },
+    updateFileName: () => null,
   };
 
   return {
@@ -66,7 +94,7 @@ export const useFileStore = create<IFile>((set, getState) => {
       }));
     },
 
-    getFileUrl: async(uniqueToken: string) => {
+    getFileUrl: async (uniqueToken: string) => {
       const url = !uniqueToken
         ? FILES_GET_URL_API
         : FILES_GET_URL_API + `?unique_token=${uniqueToken}`;
@@ -103,19 +131,78 @@ export const useFileStore = create<IFile>((set, getState) => {
         const headerOptions = {
           'Content-Type': 'multipart/form-data',
         };
-
         const folderToken = getState().uploadFile.folderUniqueToken;
 
         if (folderToken) {
-          formData.append('data[folder_unique_token]', folderToken);
+          formData.append('file_upload[folder_unique_token]', folderToken);
         }
 
-        formData.append('data[file_upload]', files[0]);
+        formData.append('file_upload[file_upload]', files[0]);
 
         useAuthStore
           .getState()
           .api.postRequest(FILES_BASE_API, formData, headerOptions);
       },
+    },
+
+    renameFile: {
+      setNewPathName: (newPathName: string) => {
+        set((state) => ({
+          ...state,
+          renameFile: {
+            ...state.renameFile,
+            newPathName: newPathName,
+          },
+        }));
+      },
+
+      setFolderUniqueToken: (token: string | null) => {
+        set((state) => ({
+          ...state,
+          renameFile: {
+            ...state.renameFile,
+            folderUniqueToken: token,
+          },
+        }));
+      },
+
+      request: async (file_token: string) => {
+        const folderToken = getState().renameFile.folderUniqueToken;
+        const bodyData = {
+          file_upload: {
+            unique_token: file_token,
+            new_name: getState().renameFile.newPathName,
+          },
+        };
+
+        if (folderToken !== null) {
+          const folderUniqueToken = {
+            folder_unique_token: folderToken,
+          };
+
+          Object.assign(bodyData, folderUniqueToken);
+        }
+
+        useAuthStore.getState().api.putRequest(FILE_RENAME_API, bodyData);
+      },
+    },
+
+    updateFileName: async (data: unknown) => {
+      const responseData = data as IRenamedFileSocketData;
+
+      set((state) => ({
+        ...state,
+        files: state.files.map((obj) => {
+          const data = responseData?.data[0];
+          console.log(obj.unique_token === data.unique_token);
+          if (obj.unique_token === data.unique_token) {
+            obj.filename = data.filename;
+            return obj;
+          }
+
+          return obj;
+        }),
+      }));
     },
   };
 });

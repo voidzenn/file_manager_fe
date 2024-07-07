@@ -14,6 +14,7 @@ import { useFileStore } from '@/store/userFileStore';
 import { useActionCable } from '@/hooks/useActionCable';
 import { IFileListResponse } from '@/apis/file/fileInterface';
 import { FILE_CREATED } from '@/constants/socketActions';
+import { TOAST_VARIANT_GHOST } from '@/constants/components/ui/toastConstant';
 import { getAuthTokenCookie } from '@/lib/cookie';
 
 const UploadFileSchema = z.object({
@@ -103,7 +104,7 @@ const UploadFile = () => {
             <div className="flex justify-end mt-5">
               <Button
                 type="button"
-                variant={'ghost'}
+                variant={TOAST_VARIANT_GHOST}
                 className="mr-4"
                 onClick={() => {
                   setOpenDialog(false);

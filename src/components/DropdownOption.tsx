@@ -6,48 +6,83 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 import { useFoldersStore } from "@/store/useFolderStore";
+import { useFileStore } from "@/store/userFileStore";
+import { TOAST_VARIANT_DESTRUCTIVE, TOAST_VARIANT_GHOST } from "@/constants/components/ui/toastConstant";
 
 interface IProps {
-  object_id: string;
   object_parent_id?: string;
+  object_id: string;
   object_name: string;
+  object_type: 'folder' | 'file';
 }
 
-const DropdownOption = ({ object_parent_id, object_id, object_name }: IProps) => {
+const DropdownOption = ({
+  object_parent_id,
+  object_id,
+  object_name,
+  object_type,
+}: IProps) => {
   const [openRenameDialog, setOpenRenameDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [disableRenameBtn, setDisableRenameBtn] = useState<boolean>(true);
   const { renameFolder, renameFolderRequest } = useFoldersStore();
+  const { renameFile } = useFileStore();
 
   const handleInput = (e) => {
     const value = e.target.value;
 
-    renameFolder.setNewPathName(value);
-  }
+    if (object_type === 'folder') {
+      renameFolder.setNewPathName(value);
+    } else {
+      renameFile.setNewPathName(value);
+    }
+  };
 
   const handleRename = async () => {
-    renameFolder.setParentFolderToken(String(object_parent_id));
-    renameFolder.setUniqueToken(object_id);
+    if (object_type === 'folder') {
+      renameFolder.setParentFolderToken(String(object_parent_id));
+      renameFolder.setUniqueToken(object_id);
 
-    await renameFolderRequest();
+      await renameFolderRequest();
+    }
+
+    if (object_type === 'file') {
+      await renameFile.request(object_id);
+    }
 
     setOpenRenameDialog(false);
-  }
+  };
 
   useEffect(() => {
-    if (
-      renameFolder.newPathName?.length === 0 ||
-      renameFolder.newPathName === null ||
-      renameFolder.newPathName === object_name
-    ) {
-      setDisableRenameBtn(true);
-    } else {
-      setDisableRenameBtn(false);
+    if (object_type === 'folder') {
+      if (
+        renameFolder.newPathName?.length === 0 ||
+        renameFolder.newPathName === null ||
+        renameFolder.newPathName === object_name
+      ) {
+        setDisableRenameBtn(true);
+      } else {
+        setDisableRenameBtn(false);
+      }
+    }
+
+    if (object_type === 'file') {
+      if (
+        renameFile.newPathName?.length !== 0 &&
+        renameFile.newPathName !== null &&
+        renameFile.newPathName !== undefined &&
+        renameFile.newPathName !== object_name
+      ) {
+        setDisableRenameBtn(false);
+      } else {
+        setDisableRenameBtn(true);
+      }
     }
   }, [
+    object_type,
     renameFolder.newPathName,
+    renameFile.newPathName,
     setDisableRenameBtn,
-    disableRenameBtn,
     object_name,
   ]);
 
@@ -66,7 +101,7 @@ const DropdownOption = ({ object_parent_id, object_id, object_name }: IProps) =>
           <div className="w-full flex justify-end mt-2">
             <Button
               type="button"
-              variant={'ghost'}
+              variant={TOAST_VARIANT_GHOST}
               className="mr-4"
               onClick={() => {
                 setOpenRenameDialog(false);
@@ -88,10 +123,33 @@ const DropdownOption = ({ object_parent_id, object_id, object_name }: IProps) =>
         <DialogTrigger className="p-2 hover:bg-red-500">
           <Label>Delete</Label>
         </DialogTrigger>
-        <DialogContent></DialogContent>
+        <DialogContent>
+          <Label className="mx-2 my-2">
+            Are you sure you want to delete this {object_type} ?
+          </Label>
+          <div className="w-full flex justify-end">
+            <Button
+              type="button"
+              variant={TOAST_VARIANT_GHOST}
+              className="mr-4"
+              onClick={() => {
+                setOpenRenameDialog(false);
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              className="w-20"
+              variant={TOAST_VARIANT_DESTRUCTIVE}
+              onClick={handleRename}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
       </Dialog>
     </div>
   );
-}
+};
 
 export default DropdownOption;
