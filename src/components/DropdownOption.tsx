@@ -7,14 +7,17 @@ import { Label } from "./ui/label";
 
 import { useFoldersStore } from "@/store/useFolderStore";
 import { useFileStore } from "@/store/userFileStore";
+import { TOAST_VARIANT_DESTRUCTIVE, TOAST_VARIANT_GHOST } from "@/constants/components/ui/toastConstant";
 
 interface IProps {
+  object_parent_id?: string;
   object_id: string;
   object_name: string;
-  object_type: "folder" | "file";
+  object_type: 'folder' | 'file';
 }
 
 const DropdownOption = ({
+  object_parent_id,
   object_id,
   object_name,
   object_type,
@@ -98,7 +101,7 @@ const DropdownOption = ({
           <div className="w-full flex justify-end mt-2">
             <Button
               type="button"
-              variant={'ghost'}
+              variant={TOAST_VARIANT_GHOST}
               className="mr-4"
               onClick={() => {
                 setOpenRenameDialog(false);
@@ -120,7 +123,30 @@ const DropdownOption = ({
         <DialogTrigger className="p-2 hover:bg-red-500">
           <Label>Delete</Label>
         </DialogTrigger>
-        <DialogContent></DialogContent>
+        <DialogContent>
+          <Label className="mx-2 my-2">
+            Are you sure you want to delete this {object_type} ?
+          </Label>
+          <div className="w-full flex justify-end">
+            <Button
+              type="button"
+              variant={TOAST_VARIANT_GHOST}
+              className="mr-4"
+              onClick={() => {
+                setOpenRenameDialog(false);
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              className="w-20"
+              variant={TOAST_VARIANT_DESTRUCTIVE}
+              onClick={handleRename}
+            >
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
       </Dialog>
     </div>
   );

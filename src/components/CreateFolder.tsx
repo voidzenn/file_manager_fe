@@ -11,6 +11,7 @@ import { ICreatedFolderSocketData, useFoldersStore } from '@/store/useFolderStor
 import { useActionCable } from '@/hooks/useActionCable';
 import { FOLDER_CREATED } from '@/constants/socketActions';
 import { getAuthTokenCookie } from '@/lib/cookie';
+import { TOAST_VARIANT_GHOST } from '@/constants/components/ui/toastConstant';
 
 const CreateFolder = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -73,7 +74,7 @@ const CreateFolder = () => {
         <div className="w-full flex justify-end mt-2">
           <Button
             type="button"
-            variant={'ghost'}
+            variant={TOAST_VARIANT_GHOST}
             className="mr-4"
             onClick={() => {
               setOpenDialog(false);
