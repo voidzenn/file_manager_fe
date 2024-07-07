@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { File, FileX, Image, LucideMoreVertical, Video } from 'lucide-react';
 
 import FileView from './FileView';
@@ -7,11 +7,13 @@ import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import DropdownOption from './DropdownOption';
 
-import { useFileStore } from '@/store/userFileStore';
+import { IRenamedFileSocketData, useFileStore } from '@/store/userFileStore';
 import { useFileExtensionCheck } from '@/hooks/useFileExtensionCheck';
+import { useActionCable } from '@/hooks/useActionCable';
 
 import { IFileData, IFileUrlResponse } from '@/apis/file/fileInterface';
-
+import { FILE_RENAMED } from '@/constants/socketActions';
+import { getAuthTokenCookie } from '@/lib/cookie';
 
 interface IProps {
   files: [IFileData] | [];
@@ -25,8 +27,26 @@ const FileList = ({ files }: IProps) => {
   const [sourceUrl, setSourceUrl] = useState<string>('');
   const [fileName, setFileName] = useState<string>('');
   const [fileExtension, setFileExtension] = useState<string>('');
-  const { getFileUrl } = useFileStore();
+  const { getFileUrl, updateFileName } = useFileStore();
   const { isFileImage, isFileVideo, isFileDocument } = useFileExtensionCheck();
+  const { subscription, receivedData } = useActionCable(
+    'FileChannel',
+    String(getAuthTokenCookie())
+  );
+
+  useEffect(() => {
+    subscription;
+  }, []);
+
+  useEffect(() => {
+    const responseData = receivedData as IRenamedFileSocketData;
+    const isFileRenamedAction =
+      responseData && responseData.action === FILE_RENAMED;
+
+    if (isFileRenamedAction) {
+      updateFileName(receivedData);
+    }
+  }, [receivedData, updateFileName]);
 
   const FileLogo = ({ file_extension }: FileLogoProp) => {
     const logoSize = '20px';

@@ -21,6 +21,21 @@ export interface ICreatedFileSocketData {
   ];
 }
 
+export interface IRenamedFileSocketData {
+  action: string;
+  data: [
+    {
+      id: number | null;
+      unique_token: string | null;
+      name: string | null;
+      filename: string | null;
+      file_extension: string | null;
+      folder_id: number | null;
+      created_at: string;
+    }
+  ];
+}
+
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
@@ -36,6 +51,7 @@ interface IFile {
     setNewPathName: (newPath: string) => void;
     request: (file_token: string) => void;
   };
+  updateFileName: (data: unknown) => void;
 }
 
 export const useFileStore = create<IFile>((set, getState) => {
@@ -50,11 +66,12 @@ export const useFileStore = create<IFile>((set, getState) => {
       request: () => null,
     },
     renameFile: {
-      newPathName: "",
-      folderUniqueToken: "",
+      newPathName: '',
+      folderUniqueToken: '',
       setNewPathName: () => null,
       request: () => null,
-    }
+    },
+    updateFileName: () => null,
   };
 
   return {
@@ -136,7 +153,7 @@ export const useFileStore = create<IFile>((set, getState) => {
             ...state.renameFile,
             newPathName: newPathName,
           },
-        }))
+        }));
       },
 
       setFolderUniqueToken: (token: string | null) => {
@@ -154,20 +171,38 @@ export const useFileStore = create<IFile>((set, getState) => {
         const bodyData = {
           file_upload: {
             unique_token: file_token,
-            new_name: getState().renameFile.newPathName
+            new_name: getState().renameFile.newPathName,
           },
         };
 
         if (folderToken !== null) {
           const folderUniqueToken = {
-            folder_unique_token: folderToken
-          }
+            folder_unique_token: folderToken,
+          };
 
-          Object.assign(bodyData, folderUniqueToken)
+          Object.assign(bodyData, folderUniqueToken);
         }
 
         useAuthStore.getState().api.putRequest(FILE_RENAME_API, bodyData);
       },
+    },
+
+    updateFileName: async (data: unknown) => {
+      const responseData = data as IRenamedFileSocketData;
+
+      set((state) => ({
+        ...state,
+        files: state.files.map((obj) => {
+          const data = responseData?.data[0];
+          console.log(obj.unique_token === data.unique_token);
+          if (obj.unique_token === data.unique_token) {
+            obj.filename = data.filename;
+            return obj;
+          }
+
+          return obj;
+        }),
+      }));
     },
   };
 });
