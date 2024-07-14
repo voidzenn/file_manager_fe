@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios';
 import { useAuthStore } from './useAuthStore';
 
 import { IFileData, IFileListResponse, IFileUrlResponse } from '@/apis/file/fileInterface';
-import { FILES_BASE_API, FILES_GET_URL_API, FILE_RENAME_API } from '@/constants/apis';
+import { FILES_BASE_API, FILES_GET_URL_API, FILE_REMOVE_FILE_API, FILE_RENAME_API } from '@/constants/apis';
 
 export interface ICreatedFileSocketData {
   action: string;
@@ -36,6 +36,22 @@ export interface IRenamedFileSocketData {
   ];
 }
 
+export interface IRemovedFileSocketData {
+  action: string;
+  data: [
+    {
+      id: number | null;
+      unique_token: string | null;
+      name: string | null;
+      filename: string | null;
+      file_extension: string | null;
+      folder_id: number | null;
+      created_at: string;
+    }
+  ];
+}
+
+
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
@@ -52,6 +68,8 @@ interface IFile {
     request: (file_token: string) => void;
   };
   updateFileName: (data: unknown) => void;
+  removeFileRequest: (uniqueToken: string) => void;
+  removeFilePath: (data: unknown) => void;
 }
 
 export const useFileStore = create<IFile>((set, getState) => {
@@ -72,6 +90,8 @@ export const useFileStore = create<IFile>((set, getState) => {
       request: () => null,
     },
     updateFileName: () => null,
+    removeFileRequest: () => null,
+    removeFilePath: () => null
   };
 
   return {
@@ -204,5 +224,22 @@ export const useFileStore = create<IFile>((set, getState) => {
         }),
       }));
     },
+
+    removeFileRequest: async (uniqueToken: string) => {
+      const url = FILE_REMOVE_FILE_API + "?unique_token=" + uniqueToken;
+
+      await useAuthStore.getState().api.deleteRequest(url);
+    },
+
+    removeFilePath: (data: unknown) => {
+      const response = data as IRemovedFileSocketData;
+      const responseData = response.data[0];
+
+      set((state) => ({
+        files: state.files.filter(
+          (item) => item.unique_token !== responseData.unique_token
+        ),
+      }));
+    }
   };
 });
