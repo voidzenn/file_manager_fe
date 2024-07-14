@@ -6,7 +6,7 @@ import {
   IFolderData,
   IFolderListResponse
 } from '@/apis/folder/folderInterface';
-import { FOLDERS_BASE_API, FOLDERS_RENAME_API } from '@/constants/apis';
+import { FOLDERS_BASE_API, FOLDERS_REMOVE_FOLDER_API, FOLDERS_RENAME_API } from '@/constants/apis';
 
 interface IFolder {
   folders: [IFolderData] | [];
@@ -20,7 +20,7 @@ interface IFolder {
   createFolderRequest: () => void;
   addSingleFolderToList: (data: unknown) => void;
   renameFolder: {
-    uniqueToken: string | null,
+    uniqueToken: string | null;
     parentFolderToken: string | null;
     newPathName: string | null;
     setNewPathName: (newPath: string) => void;
@@ -29,6 +29,7 @@ interface IFolder {
   };
   renameFolderRequest: () => void;
   updateFolderPath: (data: unknown) => void;
+  removeFolderRequest: (uniqueToken: string) => void;
 }
 
 export interface ICreatedFolderSocketData {
@@ -115,6 +116,7 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     },
     renameFolderRequest: () => null,
     updateFolderPath: () => null,
+    removeFolderRequesT: () => null
   };
 
   return {
@@ -190,5 +192,21 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
         }),
       }));
     },
+
+    removeFolder: {
+      setUniqueToken: (uniqueToken: string) => set((state) => ({
+        ...state,
+        removeFolder: {
+          ...state.removeFolder,
+          uniqueToken: uniqueToken
+        }
+      }))
+    },
+
+    removeFolderRequest: async (unique_token: string) => {
+      const url = FOLDERS_REMOVE_FOLDER_API + '?unique_token=' + unique_token;
+
+      await useAuthStore.getState().api.deleteRequest(url);
+    }
   };
 });

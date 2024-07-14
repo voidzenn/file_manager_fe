@@ -65,6 +65,7 @@ interface IAuth {
     getRequest: (path: string) => void;
     postRequest: (path: string, data?: unknown, options?: unknown) => void;
     putRequest: (path: string, data?: unknown, options?: unknown) => void;
+    deleteRequest: (path: string, options?: unknown) => void;
   };
 }
 
@@ -72,7 +73,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
   const auth = {
     accessToken: '',
     refreshToken: '',
-    getHeaderToken: () => false,
+    getHeaderToken: () => {},
     isAuthenticated: () => false,
   };
 
@@ -106,7 +107,9 @@ export const useAuthStore = create<IAuth>((set, getState) => {
       data: {},
       error: {},
       getRequest: () => null,
+      postRequest: () => null,
       putRequest: () => null,
+      deleteRequest: () => null
     },
   };
 
@@ -317,6 +320,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             }
           });
       },
+
       postRequest: async (path: string, data?: unknown, options?: unknown) => {
         const headers = getState().auth.getHeaderToken();
 
@@ -331,6 +335,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             return error;
           });
       },
+
       putRequest: async (path: string, data?: unknown, options?: unknown) => {
         const headers = getState().auth.getHeaderToken();
 
@@ -345,6 +350,15 @@ export const useAuthStore = create<IAuth>((set, getState) => {
             return error;
           });
       },
+
+      deleteRequest: async(path: string, options?: unknown) => {
+        const headers = getState().auth.getHeaderToken();
+
+        options && Object.assign(headers, options);
+
+        return await axiosConfig
+          .delete(path, { headers: headers })
+      }
     },
   };
 });
