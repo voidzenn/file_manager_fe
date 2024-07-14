@@ -12,7 +12,7 @@ import { useFileExtensionCheck } from '@/hooks/useFileExtensionCheck';
 import { useActionCable } from '@/hooks/useActionCable';
 
 import { IFileData, IFileUrlResponse } from '@/apis/file/fileInterface';
-import { FILE_RENAMED } from '@/constants/socketActions';
+import { FILE_REMOVE, FILE_REMOVED, FILE_RENAMED } from '@/constants/socketActions';
 import { getAuthTokenCookie } from '@/lib/cookie';
 
 interface IProps {
@@ -27,7 +27,7 @@ const FileList = ({ files }: IProps) => {
   const [sourceUrl, setSourceUrl] = useState<string>('');
   const [fileName, setFileName] = useState<string>('');
   const [fileExtension, setFileExtension] = useState<string>('');
-  const { getFileUrl, updateFileName } = useFileStore();
+  const { getFileUrl, updateFileName, removeFilePath } = useFileStore();
   const { isFileImage, isFileVideo, isFileDocument } = useFileExtensionCheck();
   const { subscription, receivedData } = useActionCable(
     'FileChannel',
@@ -43,10 +43,17 @@ const FileList = ({ files }: IProps) => {
     const isFileRenamedAction =
       responseData && responseData.action === FILE_RENAMED;
 
+    const isFileRemovedAction =
+      responseData && responseData.action === FILE_REMOVED;
+
     if (isFileRenamedAction) {
       updateFileName(receivedData);
     }
-  }, [receivedData, updateFileName]);
+
+    if (isFileRemovedAction) {
+      removeFilePath(receivedData);
+    }
+  }, [receivedData, updateFileName, removeFilePath]);
 
   const FileLogo = ({ file_extension }: FileLogoProp) => {
     const logoSize = '20px';

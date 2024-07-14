@@ -30,7 +30,7 @@ const DropdownOption = ({
     renameFolderRequest,
     removeFolderRequest
   } = useFoldersStore();
-  const { renameFile } = useFileStore();
+  const { renameFile, removeFileRequest } = useFileStore();
   const isObjectTypeFolder = object_type === 'folder';
   const isObjectTypeFile = object_type === 'file';
 
@@ -60,7 +60,13 @@ const DropdownOption = ({
   };
 
   const handleDelete = async () => {
-    await removeFolderRequest(object_id);
+    if (isObjectTypeFolder) {
+      await removeFolderRequest(object_id);
+    }
+
+    if (isObjectTypeFile) {
+      await removeFileRequest(object_id);
+    }
 
     setOpenDeleteDialog(false);
   }
