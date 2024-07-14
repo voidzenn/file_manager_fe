@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 import { useFoldersStore } from "@/store/useFolderStore";
 import { useFileStore } from "@/store/userFileStore";

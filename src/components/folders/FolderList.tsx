@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Label } from './ui/label';
+import { Label } from '../ui/label';
 import { Folder, LucideMoreVertical } from 'lucide-react';
 
 import { IFolderData } from '@/apis/folder/folderInterface';
 import { ROUTES } from '@/constants/routes';
-import { Button } from './ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import DropdownOption from './DropdownOption';
+import { Button } from '../ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import DropdownOption from '../common/DropdownOption';
 
 import { IRenamedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
 import { useActionCable } from '@/hooks/useActionCable';

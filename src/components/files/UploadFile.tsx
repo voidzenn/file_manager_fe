@@ -5,10 +5,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { FileUp } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 
 import { useFileStore } from '@/store/userFileStore';
 import { useActionCable } from '@/hooks/useActionCable';

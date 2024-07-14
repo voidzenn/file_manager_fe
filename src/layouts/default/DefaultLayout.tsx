@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
+import Sidebar from "@/components/common/Sidebar";
+import Header from "@/components/common/Header";
 import { ROUTES } from '@/constants/routes';
 
 interface IProp {
