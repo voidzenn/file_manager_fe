@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Label } from '@radix-ui/react-label';
 import { Menu } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 
 import { removeAllCookie } from '@/lib/cookie';
 import { APP } from '@/constants/app';

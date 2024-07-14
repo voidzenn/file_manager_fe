@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import FolderList from '@/components/FolderList';
+import FolderList from '@/components/folders/FolderList';
 
 import { useFoldersStore } from '@/store/useFolderStore';
 

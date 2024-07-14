@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { File, FileX, Image, LucideMoreVertical, Video } from 'lucide-react';
 
-import FileView from './FileView';
-import { Label } from './ui/label';
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import DropdownOption from './DropdownOption';
+import FileView from '@/components/files/FileView';
+import { Label } from '../ui/label';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import DropdownOption from '../common/DropdownOption';
 
 import { IRenamedFileSocketData, useFileStore } from '@/store/userFileStore';
 import { useFileExtensionCheck } from '@/hooks/useFileExtensionCheck';

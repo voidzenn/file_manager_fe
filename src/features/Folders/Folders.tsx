@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import FolderList from '@/components/FolderList';
-import FileList from '@/components/FileList';
+import FolderList from '@/components/folders/FolderList';
+import FileList from '@/components/files/FileList';
 import { useFoldersStore } from '@/store/useFolderStore';
 import { useFileStore } from '@/store/userFileStore';
 
