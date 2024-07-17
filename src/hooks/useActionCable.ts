@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import ActionCable, { Channel } from 'actioncable';
 
 type SendFunction = (action: string, message: unknown) => void;
 
-interface IReceivedData {
+export interface IReceivedData {
   action: string;
-  data: [unknown];
+  data: unknown[];
 }
 
 interface HookReturnType {
@@ -18,11 +18,15 @@ export const useActionCable = (channelName: string, token: string): HookReturnTy
   const [subscription, setSubscription] = useState<Channel | null>(null);
   const [receivedData, setReceivedData] = useState<IReceivedData>();
   const [send, setSend] = useState<SendFunction | null>(null);
+  const consumer = useRef<ActionCable.Cable | null>(null);
 
   useEffect(() => {
-    const consumer = ActionCable.createConsumer(`ws://localhost:3000/cable?token=${token}`);
+    // Prevent duplication subscription initialization
+    if(!consumer.current) {
+      consumer.current = ActionCable.createConsumer(`ws://localhost:3000/cable?token=${token}`);
+    }
 
-    const newSubscription = consumer.subscriptions.create(channelName, {
+    const newSubscription = consumer.current.subscriptions.create(channelName, {
       connected() {
         console.log('Connected to channel');
       },
@@ -48,7 +52,7 @@ export const useActionCable = (channelName: string, token: string): HookReturnTy
         newSubscription.unsubscribe();
       }
     };
-  }, [channelName]);
+  }, [channelName, token]);
 
   return { subscription, receivedData, send };
 };

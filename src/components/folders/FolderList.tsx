@@ -11,8 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import DropdownOption from '../common/DropdownOption';
 
 import { IRenamedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
-import { useActionCable } from '@/hooks/useActionCable';
-import { getAuthTokenCookie } from '@/lib/cookie';
+import { useSocketStore } from '@/store/useSocketStore';
 import { FOLDER_REMOVED, FOLDER_RENAMED } from '@/constants/socketActions';
 
 interface IProps {
@@ -23,20 +22,13 @@ const FolderList = ({ folders }: IProps) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { renameFolder, updateFolderPath, removeFolderPath } = useFoldersStore();
-  const { subscription, receivedData } = useActionCable(
-    'FolderChannel',
-    String(getAuthTokenCookie())
-  );
+  const { receivedData } = useSocketStore();
 
   const handleFolderClick = (uniqueToken: string) => {
     navigate(ROUTES.folders + `/${uniqueToken}`, {
       state: { uniqueToken: uniqueToken },
     });
   };
-
-  useEffect(() => {
-    subscription;
-  }, []);
 
   useEffect(() => {
     const responseData = receivedData as IRenamedFolderSocketData;

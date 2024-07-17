@@ -51,7 +51,6 @@ export interface IRemovedFileSocketData {
   ];
 }
 
-
 interface IFile {
   files: [IFileData] | [];
   getFileList: (uniqueToken?: string) => void;
@@ -59,6 +58,7 @@ interface IFile {
   addFileToFileList: (data: unknown) => void;
   uploadFile: {
     folderUniqueToken: string | null;
+    setFolderUniqueToken: (uniqueToken: string | null) => void;
     request: (files: FileList) => void;
   };
   renameFile: {

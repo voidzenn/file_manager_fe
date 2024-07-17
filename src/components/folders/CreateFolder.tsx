@@ -8,23 +8,15 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 
 import { ICreatedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
-import { useActionCable } from '@/hooks/useActionCable';
+import { useSocketStore } from '@/store/useSocketStore';
 import { FOLDER_CREATED } from '@/constants/socketActions';
-import { getAuthTokenCookie } from '@/lib/cookie';
 import { TOAST_VARIANT_GHOST } from '@/constants/components/ui/toastConstant';
 
 const CreateFolder = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const { id } = useParams();
   const { createFolder, createFolderRequest, addSingleFolderToList } = useFoldersStore();
-  const { subscription, receivedData } = useActionCable(
-    'FolderChannel',
-    String(getAuthTokenCookie())
-  );
-
-  useEffect(() => {
-    subscription;
-  }, []);
+  const { receivedData } = useSocketStore();
 
   useEffect(() => {
     // Set token same as in URL params token
@@ -47,7 +39,7 @@ const CreateFolder = () => {
     }
   }, [receivedData, addSingleFolderToList, id, createFolder.parentFolderToken]);
 
-  const handlePathInput = (e) => {
+  const handlePathInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     createFolder.setPathName(e?.target?.value);
   };
 

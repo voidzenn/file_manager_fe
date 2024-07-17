@@ -9,11 +9,10 @@ import DropdownOption from '../common/DropdownOption';
 
 import { IRenamedFileSocketData, useFileStore } from '@/store/userFileStore';
 import { useFileExtensionCheck } from '@/hooks/useFileExtensionCheck';
-import { useActionCable } from '@/hooks/useActionCable';
+import { useSocketStore } from '@/store/useSocketStore';
 
 import { IFileData, IFileUrlResponse } from '@/apis/file/fileInterface';
-import { FILE_REMOVE, FILE_REMOVED, FILE_RENAMED } from '@/constants/socketActions';
-import { getAuthTokenCookie } from '@/lib/cookie';
+import { FILE_REMOVED, FILE_RENAMED } from '@/constants/socketActions';
 
 interface IProps {
   files: [IFileData] | [];
@@ -29,14 +28,7 @@ const FileList = ({ files }: IProps) => {
   const [fileExtension, setFileExtension] = useState<string>('');
   const { getFileUrl, updateFileName, removeFilePath } = useFileStore();
   const { isFileImage, isFileVideo, isFileDocument } = useFileExtensionCheck();
-  const { subscription, receivedData } = useActionCable(
-    'FileChannel',
-    String(getAuthTokenCookie())
-  );
-
-  useEffect(() => {
-    subscription;
-  }, []);
+  const { receivedData } = useSocketStore();
 
   useEffect(() => {
     const responseData = receivedData as IRenamedFileSocketData;
