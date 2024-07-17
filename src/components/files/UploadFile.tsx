@@ -11,11 +11,11 @@ import { Button } from '../ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 
 import { useFileStore } from '@/store/userFileStore';
-import { useActionCable } from '@/hooks/useActionCable';
-import { IFileListResponse } from '@/apis/file/fileInterface';
 import { FILE_CREATED } from '@/constants/socketActions';
 import { TOAST_VARIANT_GHOST } from '@/constants/components/ui/toastConstant';
-import { getAuthTokenCookie } from '@/lib/cookie';
+import { useSocketStore } from '@/store/useSocketStore';
+import { IReceivedData } from '@/hooks/useActionCable';
+import { IFileData } from '@/apis/file/fileInterface';
 
 const UploadFileSchema = z.object({
   files: z
@@ -30,7 +30,7 @@ const UploadFile = () => {
   const [disableUpload, setDisableUpload] = useState<boolean>(true);
   const { id } = useParams();
   const { uploadFile, addFileToFileList } = useFileStore();
-  const { subscription, receivedData } = useActionCable('FileChannel', String(getAuthTokenCookie()));
+  const { receivedData } = useSocketStore();
 
   const form = useForm<z.infer<typeof UploadFileSchema>>({
     resolver: zodResolver(UploadFileSchema),
@@ -41,24 +41,21 @@ const UploadFile = () => {
   const filesRef = form.register('files', { required: true });
 
   useEffect(() => {
-    subscription;
-  }, []);
-
-  useEffect(() => {
     useFileStore.getState().uploadFile.setFolderUniqueToken(id ?? null);
   }, [id]);
 
   useEffect(() => {
-    const responseData = receivedData as IFileListResponse;
-    const isFileCreation = responseData && responseData.action === FILE_CREATED;
+    const response = receivedData as IReceivedData;
+    const isFileCreation = response && response.action === FILE_CREATED;
 
     if (isFileCreation) {
-      const folderId = responseData.data[0].folder_id;
+      const responseData = response.data[0] as IFileData;
+      const folderId = responseData.folder_id;
 
       if (uploadFile.folderUniqueToken === id && folderId !== null) {
-        addFileToFileList(responseData);
+        addFileToFileList(response);
       } else if (uploadFile.folderUniqueToken === null && folderId === null) {
-        addFileToFileList(responseData);
+        addFileToFileList(response);
       }
     }
   }, [id, receivedData, uploadFile.folderUniqueToken , addFileToFileList]);

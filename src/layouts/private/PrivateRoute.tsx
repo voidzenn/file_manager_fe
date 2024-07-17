@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 
 import { ROUTES } from '@/constants/routes';
+import ActionCableSocket from '@/components/common/ActionCableSocket';
 
 interface IProp {
   children: ReactNode;
@@ -19,7 +20,12 @@ const PrivateLayout = ({ children }: IProp) => {
     }
   }, [auth, navigate]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <ActionCableSocket />
+    </>
+  );
 };
 
 export default PrivateLayout;

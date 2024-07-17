@@ -34,7 +34,7 @@ const DropdownOption = ({
   const isObjectTypeFolder = object_type === 'folder';
   const isObjectTypeFile = object_type === 'file';
 
-  const handleInput = (e) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
     if (isObjectTypeFolder) {
