@@ -21,11 +21,9 @@ interface IFolder {
   addSingleFolderToList: (data: unknown) => void;
   renameFolder: {
     uniqueToken: string | null;
-    parentFolderToken: string | null;
     newPathName: string | null;
     setNewPathName: (newPath: string) => void;
     setUniqueToken: (uniqueToken: string) => void;
-    setParentFolderToken: (parentFolderToken: string | null) => void;
   };
   renameFolderRequest: () => void;
   updateFolderPath: (data: unknown) => void;
@@ -103,15 +101,6 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
     addSingleFolderToList: () => null,
     renameFolder: {
       newPathName: null,
-      parentFolderToken: null,
-      setParentFolderToken: (parentFolderToken: string) =>
-        set((state) => ({
-          ...state,
-          renameFolder: {
-            ...state.renameFolder,
-            parentFolderToken: parentFolderToken,
-          },
-        })),
       setUniqueToken: (uniqueToken: string) =>
         set((state) => ({
           ...state,
@@ -179,14 +168,9 @@ export const useFoldersStore = create<IFolder>((set, getState) => {
       const bodyData = {
         folder: {
           unique_token: getState().renameFolder.uniqueToken,
-          new_path: getState().renameFolder.newPathName + "/",
+          path: getState().renameFolder.newPathName + "/",
         },
       };
-      const parentFolderToken = getState().renameFolder.parentFolderToken;
-
-      if (parentFolderToken !== '' && parentFolderToken !== null) {
-        Object.assign(bodyData, { parent_unique_token: parentFolderToken });
-      }
 
       await useAuthStore
         .getState()
