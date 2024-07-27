@@ -24,10 +24,9 @@ import {
 
 import { useAuthStore } from '@/store/useAuthStore';
 
-import { TOAST_VARIANT_DEFAULT, TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
+import { TOAST_VARIANT_DESTRUCTIVE } from '@/constants/components/ui/toastConstant';
 import { ROUTES } from '@/constants/routes';
 import { Label } from '@/components/ui/label';
-import { SHORT_DELAY_TIME } from '@/constants/timer';
 
 const SigninSchema = z.object({
   email: string(),
@@ -39,10 +38,7 @@ const Signin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const {
-    signin,
-    auth
-  } = useAuthStore();
+  const { signin, auth } = useAuthStore();
 
   const form = useForm<z.infer<typeof SigninSchema>>({
     resolver: zodResolver(SigninSchema),
@@ -65,21 +61,6 @@ const Signin = () => {
   }
 
   useEffect(() => {
-    if (
-      signin.success &&
-      signin.successMessage !== '' &&
-      auth.isAuthenticated()
-    ) {
-      const timeout = setTimeout(() => {
-        signin.initializeState();
-        navigate(ROUTES.folders);
-      }, 500000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [signin, navigate, auth]);
-
-  useEffect(() => {
     if (signin.errorMessage) {
       toast({
         variant: TOAST_VARIANT_DESTRUCTIVE,
@@ -89,16 +70,6 @@ const Signin = () => {
   }, [signin.errorMessage, toast]);
 
   useEffect(() => {
-    if (signin.success) {
-      toast({
-        variant: TOAST_VARIANT_DEFAULT,
-        title: signin.successMessage,
-        duration: SHORT_DELAY_TIME
-      });
-    }
-  }, [signin.success, signin.successMessage, toast]);
-
-  useEffect(() => {
     if (formWatch.email.length > 0 && formWatch.password.length > 0) {
       setDisableSubmit(false);
     } else {
@@ -106,9 +77,9 @@ const Signin = () => {
     }
   }, [form, formWatch, disableSubmit, setDisableSubmit]);
 
-  return (
+  return !auth.isAuthenticated() ? (
     <div className="flex justify-center min-h-screen min-w-full mx-auto my-auto items-center align-middle">
-      <Card className="px-12" title="test">
+      <Card className="px-12">
         <CardTitle className="mt-10 mb-10 text-center">File Manager</CardTitle>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -165,6 +136,8 @@ const Signin = () => {
         </Form>
       </Card>
     </div>
+  ) : (
+    <></>
   );
 };
 
