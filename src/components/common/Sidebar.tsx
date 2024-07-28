@@ -16,10 +16,10 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     setEnableLoader(true);
+    removeAllCookie();
 
     setTimeout(() => {
       setEnableLoader(false);
-      removeAllCookie();
       location.pathname = ROUTES.signin;
       navigate(ROUTES.signin);
     }, 1500);

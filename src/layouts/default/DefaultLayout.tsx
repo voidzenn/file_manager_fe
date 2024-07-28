@@ -37,6 +37,15 @@ const DefaultLayout = ({ children }: IProp) => {
         setSigningIn(false);
       }, 2000);
     }
+
+    if (
+      !enableLoader &&
+      currentPath === ROUTES.folders &&
+      !auth.isAuthenticated()
+    ) {
+      location.pathname = ROUTES.signin;
+      navigate(ROUTES.signin);
+    }
   }, [
     auth,
     location,

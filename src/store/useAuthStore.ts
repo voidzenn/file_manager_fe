@@ -140,17 +140,6 @@ export const useAuthStore = create<IAuth>((set, getState) => {
     setAuthUserCookie(userData);
   };
 
-  const handleRequestMessage = (data: AxiosResponse) => {
-    console.log(data);
-    // set((state) => ({
-    //   ...state,
-    //   api: {
-    //     ...state.api,
-    //     message: message
-    //   }
-    // }))
-  }
-
   return {
     ...initialState,
 
@@ -367,8 +356,6 @@ export const useAuthStore = create<IAuth>((set, getState) => {
         return await axiosConfig
           .post(path, data, { headers: headers })
           .then((data: AxiosResponse) => {
-            handleRequestMessage(data);
-
             return data;
           })
           .catch((error: AxiosError) => {

@@ -68,7 +68,7 @@ const FolderList = ({ folders }: IProps) => {
       {folders.map(({ unique_token, path, parentFolderId }: IFolderData) => {
         return (
           <div
-            className="flex gap-5 px-2 py-3 hover:bg-black hover:bg-opacity-5"
+            className="flex gap-5 px-2 py-3 hover:bg-black hover:bg-opacity-5 hover:cursor-pointer"
             key={unique_token}
             onClick={() => handleFolderClick(String(unique_token))}
           >
