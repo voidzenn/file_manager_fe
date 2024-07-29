@@ -68,10 +68,10 @@ const DefaultLayout = ({ children }: IProp) => {
         </DialogContent>
       </Dialog>
 
-      {!enableLoader && auth.isAuthenticated() && <Sidebar />}
+      {auth.isAuthenticated() && <Sidebar />}
 
       <main className="w-full h-full">
-        {!enableLoader && auth.isAuthenticated() && <Header />}
+        {auth.isAuthenticated() && <Header />}
 
         {children}
       </main>
