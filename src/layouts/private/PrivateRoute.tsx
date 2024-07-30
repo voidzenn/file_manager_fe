@@ -1,9 +1,5 @@
-import { ReactNode, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { ReactNode } from 'react';
 
-import { useAuthStore } from '@/store/useAuthStore';
-
-import { ROUTES } from '@/constants/routes';
 import ActionCableSocket from '@/components/common/ActionCableSocket';
 
 interface IProp {
@@ -11,15 +7,6 @@ interface IProp {
 }
 
 const PrivateLayout = ({ children }: IProp) => {
-  const { auth } = useAuthStore();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!auth.isAuthenticated()) {
-      navigate(ROUTES.signin);
-    }
-  }, [auth, navigate]);
-
   return (
     <>
       {children}

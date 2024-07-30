@@ -10,9 +10,11 @@ import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import DropdownOption from '../common/DropdownOption';
 
+import { useAuthStore } from '@/store/useAuthStore';
 import { IRenamedFolderSocketData, useFoldersStore } from '@/store/useFolderStore';
 import { useSocketStore } from '@/store/useSocketStore';
 import { FOLDER_REMOVED, FOLDER_RENAMED } from '@/constants/socketActions';
+import { API_RESPONSE_CODE } from '@/constants/apiResponseCode';
 
 interface IProps {
   folders: [IFolderData] | [];
@@ -21,6 +23,7 @@ interface IProps {
 const FolderList = ({ folders }: IProps) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { api } = useAuthStore();
   const { renameFolder, updateFolderPath, removeFolderPath } = useFoldersStore();
   const { receivedData } = useSocketStore();
 
@@ -52,6 +55,15 @@ const FolderList = ({ folders }: IProps) => {
     removeFolderPath,
   ]);
 
+  useEffect(() => {
+    if (
+      folders.length === 0 &&
+      api.status == String(API_RESPONSE_CODE.notFound)
+    ) {
+      navigate(-1);
+    }
+  }, [api.status, folders, navigate]);
+
   return (
     <div className="flex flex-col">
       <div className="min-h-10 w-full mt-5">
@@ -68,7 +80,7 @@ const FolderList = ({ folders }: IProps) => {
       {folders.map(({ unique_token, path, parentFolderId }: IFolderData) => {
         return (
           <div
-            className="flex gap-5 px-2 py-3 hover:bg-black hover:bg-opacity-5"
+            className="flex gap-5 px-2 py-3 hover:bg-black hover:bg-opacity-5 hover:cursor-pointer"
             key={unique_token}
             onClick={() => handleFolderClick(String(unique_token))}
           >

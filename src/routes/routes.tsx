@@ -2,7 +2,6 @@ import {
   Navigate,
   RouterProvider,
   createBrowserRouter,
-  redirect
 } from "react-router-dom";
 
 import DefaultLayout from '@/layouts/default/DefaultLayout';
@@ -12,63 +11,64 @@ import Signin from '@/features/Auth/Signin';
 import Folders from '@/features/Folders/Folders';
 
 import { ROUTES } from "@/constants/routes";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useEffect } from "react";
+import NotFound from "@/components/common/NotFound";
 
 const Routes = () => {
-  const { auth } = useAuthStore();
-
-  useEffect(() => {
-    if (auth.isAuthenticated()) {
-      redirect(ROUTES.folders);
-    }
-  }, [auth]);
-
   return (
-    <RouterProvider
-      router={createBrowserRouter([
-        {
-          path: ROUTES.root,
-          element: <Navigate to="/signin" replace />,
-        },
-        {
-          path: ROUTES.signin,
-          element: (
-            <DefaultLayout>
-              <Signin />
-            </DefaultLayout>
-          ),
-        },
-        {
-          path: ROUTES.signup,
-          element: (
-            <DefaultLayout>
-              <Signup />
-            </DefaultLayout>
-          ),
-        },
-        {
-          path: ROUTES.folders,
-          element: (
-            <PrivateRoute>
+    <>
+      <RouterProvider
+        router={createBrowserRouter([
+          {
+            path: ROUTES.root,
+            element: <Navigate to="/signin" replace />,
+          },
+          {
+            path: ROUTES.signin,
+            element: (
               <DefaultLayout>
-                <Folders />
+                <Signin />
               </DefaultLayout>
-            </PrivateRoute>
-          ),
-        },
-        {
-          path: ROUTES.foldersWithId,
-          element: (
-            <PrivateRoute>
+            ),
+          },
+          {
+            path: ROUTES.signup,
+            element: (
               <DefaultLayout>
-                <Folders />
+                <Signup />
               </DefaultLayout>
-            </PrivateRoute>
-          ),
-        },
-      ])}
-    />
+            ),
+          },
+          {
+            path: ROUTES.folders,
+            element: (
+              <PrivateRoute>
+                <DefaultLayout>
+                  <Folders />
+                </DefaultLayout>
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: ROUTES.foldersWithId,
+            element: (
+              <PrivateRoute>
+                <DefaultLayout>
+                  <Folders />
+                </DefaultLayout>
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "*",
+            element: (
+              <PrivateRoute>
+                <NotFound />
+              </PrivateRoute>
+            ),
+          },
+        ])}
+      />
+    </>
   );
 }
 

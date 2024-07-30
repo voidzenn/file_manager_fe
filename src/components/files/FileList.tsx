@@ -84,7 +84,7 @@ const FileList = ({ files }: IProps) => {
                   onClick={() => handleFileClick(String(unique_token))}
                 >
                   <FileLogo file_extension={file_extension} />
-                  <Label className="text-md">
+                  <Label className="text-md hover:cursor-pointer">
                     {filename + '.' + file_extension}
                   </Label>
                   <Popover>

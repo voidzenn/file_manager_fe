@@ -157,7 +157,7 @@ export const useFileStore = create<IFile>((set, getState) => {
           formData.append('file_upload[folder_unique_token]', folderToken);
         }
 
-        formData.append('file_upload[file_upload]', files[0]);
+        formData.append('file_upload[file]', files[0]);
 
         useAuthStore
           .getState()
@@ -191,7 +191,7 @@ export const useFileStore = create<IFile>((set, getState) => {
         const bodyData = {
           file_upload: {
             unique_token: file_token,
-            new_name: getState().renameFile.newPathName,
+            name: getState().renameFile.newPathName,
           },
         };
 

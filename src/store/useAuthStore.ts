@@ -35,6 +35,10 @@ import { ROUTES } from '@/constants/routes';
 
 interface IAuth {
   loading: boolean;
+  signingIn: boolean;
+  setSigningIn: (signingIn: boolean) => void;
+  enableLoader: boolean;
+  setEnableLoader: (enable: boolean) => void;
   auth: {
     accessToken: string | null;
     refreshToken: string | null;
@@ -61,7 +65,10 @@ interface IAuth {
   };
   api: {
     data: unknown;
+    status: string;
     error: unknown;
+    message: string | null;
+    errorMessage: string | null;
     getRequest: (path: string) => void;
     postRequest: (path: string, data?: unknown, options?: unknown) => void;
     putRequest: (path: string, data?: unknown, options?: unknown) => void;
@@ -73,13 +80,17 @@ export const useAuthStore = create<IAuth>((set, getState) => {
   const auth = {
     accessToken: '',
     refreshToken: '',
-    getHeaderToken: () => {},
+    getHeaderToken: () => { return { Authorization: "" } },
     isAuthenticated: () => false,
   };
 
   const initialState: IAuth = {
     loading: false,
-    auth,
+    enableLoader: false,
+    setEnableLoader: () => null,
+    signingIn: false,
+    setSigningIn: () => null,
+    auth: auth,
     signin: {
       success: false,
       successMessage: '',
@@ -105,11 +116,14 @@ export const useAuthStore = create<IAuth>((set, getState) => {
     },
     api: {
       data: {},
+      status: '',
       error: {},
+      message: '',
+      errorMessage: '',
       getRequest: () => null,
       postRequest: () => null,
       putRequest: () => null,
-      deleteRequest: () => null
+      deleteRequest: () => null,
     },
   };
 
@@ -131,12 +145,27 @@ export const useAuthStore = create<IAuth>((set, getState) => {
   return {
     ...initialState,
 
+    setEnableLoader: (enable: boolean) => {
+      set((state) => ({
+        ...state,
+        enableLoader: enable
+      }))
+    },
+
+    setSigningIn: (signingIn: boolean) => {
+      set((state) => ({
+        ...state,
+        signingIn: signingIn
+      }));
+    },
+
     auth: {
       getHeaderToken: () => {
         return {
           Authorization: getState().auth.accessToken ?? getAuthTokenCookie(),
         };
       },
+
       isAuthenticated: () => {
         return getAuthTokenCookie() && getAuthUserCookie();
       },
@@ -312,6 +341,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
                 ...state,
                 api: {
                   ...state.api,
+                  status: error.request.status,
                   error: error,
                 },
               }));
