@@ -65,6 +65,7 @@ interface IAuth {
   };
   api: {
     data: unknown;
+    status: string;
     error: unknown;
     message: string | null;
     errorMessage: string | null;
@@ -115,6 +116,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
     },
     api: {
       data: {},
+      status: '',
       error: {},
       message: '',
       errorMessage: '',
@@ -339,6 +341,7 @@ export const useAuthStore = create<IAuth>((set, getState) => {
                 ...state,
                 api: {
                   ...state.api,
+                  status: error.request.status,
                   error: error,
                 },
               }));
