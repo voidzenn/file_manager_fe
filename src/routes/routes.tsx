@@ -11,6 +11,7 @@ import Signin from '@/features/Auth/Signin';
 import Folders from '@/features/Folders/Folders';
 
 import { ROUTES } from "@/constants/routes";
+import NotFound from "@/components/common/NotFound";
 
 const Routes = () => {
   return (
@@ -54,6 +55,14 @@ const Routes = () => {
                 <DefaultLayout>
                   <Folders />
                 </DefaultLayout>
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "*",
+            element: (
+              <PrivateRoute>
+                <NotFound />
               </PrivateRoute>
             ),
           },

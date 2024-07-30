@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 
 import { ROUTES } from '@/constants/routes';
 import { removeAllCookie } from '@/lib/cookie';
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 
 interface IProp {
   children: ReactNode;
@@ -69,7 +70,7 @@ const DefaultLayout = ({ children }: IProp) => {
   };
 
   return (
-    <>
+    <ErrorBoundary>
       <Dialog open={enableLoader} onOpenChange={setEnableLoader}>
         <DialogContent className="flex justify-center items-center h-screen max-w-screen">
           <Loader2
@@ -90,7 +91,7 @@ const DefaultLayout = ({ children }: IProp) => {
           {children}
         </main>
       </div>
-    </>
+    </ErrorBoundary>
   );
 };
 
