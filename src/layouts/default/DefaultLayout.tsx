@@ -5,10 +5,11 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 import Sidebar from "@/components/common/Sidebar";
 import Header from "@/components/common/Header";
-import { ROUTES } from '@/constants/routes';
-
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
+
+import { ROUTES } from '@/constants/routes';
+import { removeAllCookie } from '@/lib/cookie';
 
 interface IProp {
   children: ReactNode;
@@ -56,8 +57,19 @@ const DefaultLayout = ({ children }: IProp) => {
     navigate
   ]);
 
+  const handleLogout = () => {
+    setEnableLoader(true);
+    removeAllCookie();
+
+    setTimeout(() => {
+      setEnableLoader(false);
+      location.pathname = ROUTES.signin;
+      navigate(ROUTES.signin);
+    }, 1500);
+  };
+
   return (
-    <div className="flex justify-between">
+    <>
       <Dialog open={enableLoader} onOpenChange={setEnableLoader}>
         <DialogContent className="flex justify-center items-center h-screen max-w-screen">
           <Loader2
@@ -67,15 +79,18 @@ const DefaultLayout = ({ children }: IProp) => {
           />
         </DialogContent>
       </Dialog>
+      <div className="flex justify-between">
+        {!enableLoader && auth.isAuthenticated() && (
+          <Sidebar handleLogout={handleLogout} />
+        )}
 
-      {auth.isAuthenticated() && <Sidebar />}
+        <main className="w-full h-full">
+          {!enableLoader && auth.isAuthenticated() && <Header />}
 
-      <main className="w-full h-full">
-        {auth.isAuthenticated() && <Header />}
-
-        {children}
-      </main>
-    </div>
+          {children}
+        </main>
+      </div>
+    </>
   );
 };
 

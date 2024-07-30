@@ -1,7 +1,5 @@
 import { ReactNode } from 'react';
 
-import { useAuthStore } from '@/store/useAuthStore';
-
 import ActionCableSocket from '@/components/common/ActionCableSocket';
 
 interface IProp {
@@ -9,11 +7,9 @@ interface IProp {
 }
 
 const PrivateLayout = ({ children }: IProp) => {
-  const { enableLoader } = useAuthStore();
-
   return (
     <>
-      {!enableLoader && children}
+      {children}
       <ActionCableSocket />
     </>
   );

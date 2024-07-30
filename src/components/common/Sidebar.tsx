@@ -1,30 +1,13 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-
 import { Label } from '@radix-ui/react-label';
 import { Button } from '../ui/button';
 
-import { removeAllCookie } from '@/lib/cookie';
 import { APP } from '@/constants/app';
-import { ROUTES } from '@/constants/routes';
 
-import { useAuthStore } from '@/store/useAuthStore';
+interface ISidebar {
+  handleLogout: () => void;
+}
 
-const Sidebar = () => {
-  const { setEnableLoader } = useAuthStore();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    setEnableLoader(true);
-    removeAllCookie();
-
-    setTimeout(() => {
-      setEnableLoader(false);
-      location.pathname = ROUTES.signin;
-      navigate(ROUTES.signin);
-    }, 1500);
-  };
-
+const Sidebar = ({ handleLogout }: ISidebar) => {
   return (
     <>
       <div className="w-[280px] min-h-screen border-r p-10">
