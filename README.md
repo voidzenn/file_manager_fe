@@ -27,12 +27,14 @@ A File manager with React Frontend and [Rails Backend](https://github.com/voidze
 - **Zod**: Schema validation
 
 ## Preview
+![Screenshot from 2024-08-06 00-44-11](https://github.com/user-attachments/assets/354ecbc3-c895-49c3-b5f4-0139bd782bc3)
+![Screenshot from 2024-08-06 00-43-59](https://github.com/user-attachments/assets/eebcab22-932a-4934-ba8a-113bb9c2dc02)
 ![Screenshot from 2024-08-05 17-49-49](https://github.com/user-attachments/assets/526ace27-cc08-4037-b754-dc5dfb15a803)
 ![Screenshot from 2024-08-05 17-50-25](https://github.com/user-attachments/assets/327fe08a-13ce-4d5c-9bf5-076900658301)
 ![Screenshot from 2024-08-05 17-50-28](https://github.com/user-attachments/assets/4ebdb208-39af-402c-9f79-4add5a83d14f)
 
 ## Backend API Documentation
-- When accessing BE documentation you need follow the [steps](https://github.com/voidzenn/file_manager?tab=readme-ov-file#setup).
+- When accessing BE documentation you need follow the [steps](https://github.com/voidzenn/file_manager?tab=readme-ov-file#setup)
 ![Screenshot from 2024-08-05 17-48-37](https://github.com/user-attachments/assets/0cf0fd63-f738-4b64-a5ea-d890b878b707)
 
 ## Setup
