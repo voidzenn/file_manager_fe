@@ -1,24 +1,71 @@
-## File Manager
-### React | [Rails](https://github.com/voidzenn/file_manager)
 
+# File Manager
 
-### Features created
-- Create root folder
-- Create nested folder
-- Real-time updates with sockets
-- Upload File
-- Upload File to specific folder
+## Overview
+A File manager with React Frontend and [Rails Backend](https://github.com/voidzenn/file_manager). Allows users to manage their files and folders seamlessly. The app uses Minio for object storage, ensuring that the structure in the File Manager UI mirrors the structure in Minio, providing a reliable and intuitive user experience. Additionally, the app features real-time updates with ActionCable, allowing users to see changes immediately as they happen.
 
-### Pending Features
-- Rename Folders
-- Delete File
-- Delete Folders
+## Features
+- **Folder Management:**
+  - Create Folder
+  - Create Nested Folder
+  - Rename Folder
+  - Remove Folder
+  - Get Folder List
 
-### Preview
-Login/Signup
-![Screenshot from 2024-05-14 00-48-01](https://github.com/voidzenn/file_manager_fe/assets/47482620/f4e82cd7-96b4-4d5f-b49d-db348216a634)
-![Screenshot from 2024-05-14 00-48-05](https://github.com/voidzenn/file_manager_fe/assets/47482620/afd971c0-57d3-4d60-a1e5-c1147722841b)
+- **File Management:**
+  - Create File
+  - Create File inside a Folder
+  - Rename File
+  - Remove File
+  - View File
 
-Folder List/File List
-![Screenshot from 2024-05-14 00-47-41](https://github.com/voidzenn/file_manager_fe/assets/47482620/11e73510-8784-4646-8160-d0a0c1f5797f)
-![Screenshot from 2024-05-14 00-47-49](https://github.com/voidzenn/file_manager_fe/assets/47482620/d88f5321-219c-4b89-808a-a4e57e8e1d2b)
+## Technology Stack
+- **React 18**: Framework
+- **Zustand**: State management library
+- **Shadcn**: Component library
+- **ActionCable**: Real-time updates
+- **Zod**: Schema validation
+
+## Preview
+![Screenshot from 2024-08-06 00-44-11](https://github.com/user-attachments/assets/354ecbc3-c895-49c3-b5f4-0139bd782bc3)
+![Screenshot from 2024-08-06 00-43-59](https://github.com/user-attachments/assets/eebcab22-932a-4934-ba8a-113bb9c2dc02)
+![Screenshot from 2024-08-05 17-49-49](https://github.com/user-attachments/assets/526ace27-cc08-4037-b754-dc5dfb15a803)
+![Screenshot from 2024-08-05 17-50-25](https://github.com/user-attachments/assets/327fe08a-13ce-4d5c-9bf5-076900658301)
+![Screenshot from 2024-08-05 17-50-28](https://github.com/user-attachments/assets/4ebdb208-39af-402c-9f79-4add5a83d14f)
+
+## Backend API Documentation
+- When accessing BE documentation you need follow the [steps](https://github.com/voidzenn/file_manager?tab=readme-ov-file#setup)
+![Screenshot from 2024-08-05 17-48-37](https://github.com/user-attachments/assets/0cf0fd63-f738-4b64-a5ea-d890b878b707)
+
+## Setup
+
+### Prerequisites
+Dependencies installed on your machine
+- Node.js version 14.0.0 or higher
+- Npm or Yarn
+### Installation Steps
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/voidzenn/file_manager_fe.git
+   cd <repository-name>
+   ```
+
+2. **Rename .env.example to .env:**
+   ```bash
+   mv .env.example .env
+   ```
+3. **Install dependencies:**
+   ```bash
+   npm install
+   # or 
+   yarn install
+   ```
+
+4. **Run the app:**
+   ```bash
+   yarn dev
+   ```
+
+5. **Access the web application:**
+
+   Open your browser and navigate to [http://localhost:3001](http://localhost:3001)
