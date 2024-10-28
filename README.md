@@ -27,6 +27,9 @@ A File manager with React Frontend and [Rails Backend](https://github.com/voidze
 - **Zod**: Schema validation
 
 ## Preview
+### Demo
+[Watch Video](https://drive.google.com/file/d/1sCuIr0_DZvcVsbu38O85gBYM-0qf9P_9/view?usp=sharing)
+### Screenshots
 ![Screenshot from 2024-08-06 00-44-11](https://github.com/user-attachments/assets/354ecbc3-c895-49c3-b5f4-0139bd782bc3)
 ![Screenshot from 2024-08-06 00-43-59](https://github.com/user-attachments/assets/eebcab22-932a-4934-ba8a-113bb9c2dc02)
 ![Screenshot from 2024-08-05 17-49-49](https://github.com/user-attachments/assets/526ace27-cc08-4037-b754-dc5dfb15a803)
