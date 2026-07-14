@@ -1,0 +1,10 @@
+export const SIGNIN_API ='/auth/sign_in';
+export const SIGNUP_API ='/auth/sign_up';
+export const REFRESH_TOKEN_API = '/auth/refresh_token';
+export const FOLDERS_BASE_API = '/folders';
+export const FOLDERS_RENAME_API = '/folders/rename';
+export const FOLDERS_REMOVE_FOLDER_API = '/folders/remove_folder';
+export const FILES_BASE_API = '/file_uploads';
+export const FILES_GET_URL_API = '/file_uploads/view_file';
+export const FILE_RENAME_API = '/file_uploads/rename';
+export const FILE_REMOVE_FILE_API = '/file_uploads/remove_file';

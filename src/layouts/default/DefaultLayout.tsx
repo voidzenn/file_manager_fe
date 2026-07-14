@@ -1,19 +1,98 @@
-import React, { ReactNode } from "react";
-import { Route, Routes } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { useAuthStore } from '@/store/useAuthStore';
+
+import Sidebar from "@/components/common/Sidebar";
+import Header from "@/components/common/Header";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
+
+import { ROUTES } from '@/constants/routes';
+import { removeAllCookie } from '@/lib/cookie';
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 
 interface IProp {
-  path: string;
-  component: ReactNode;
+  children: ReactNode;
 }
 
-const DefaultLayout = ({path, component}: IProp) => {
+const DefaultLayout = ({ children }: IProp) => {
+  const { auth, enableLoader, setEnableLoader, signingIn, setSigningIn } = useAuthStore();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+
+    if (
+      !enableLoader && !signingIn &&
+      (currentPath === ROUTES.signin || currentPath === ROUTES.signup) &&
+      auth.isAuthenticated()
+    ) {
+      setEnableLoader(true);
+      setSigningIn(true);
+
+      setTimeout(() => {
+        location.pathname = ROUTES.folders;
+        navigate(ROUTES.folders);
+        setEnableLoader(false);
+        setSigningIn(false);
+      }, 2000);
+    }
+
+    if (
+      !enableLoader &&
+      currentPath === ROUTES.folders &&
+      !auth.isAuthenticated()
+    ) {
+      location.pathname = ROUTES.signin;
+      navigate(ROUTES.signin);
+    }
+  }, [
+    auth,
+    location,
+    enableLoader,
+    setEnableLoader,
+    signingIn,
+    setSigningIn,
+    navigate
+  ]);
+
+  const handleLogout = () => {
+    setEnableLoader(true);
+    removeAllCookie();
+
+    setTimeout(() => {
+      setEnableLoader(false);
+      location.pathname = ROUTES.signin;
+      navigate(ROUTES.signin);
+    }, 1500);
+  };
+
   return (
-    <React.Fragment>
-      <Routes>
-        <Route path={path} element={component} />
-      </Routes>
-    </React.Fragment>
-  );
-}
+    <ErrorBoundary>
+      <Dialog open={enableLoader} onOpenChange={setEnableLoader}>
+        <DialogContent className="flex justify-center items-center h-screen max-w-screen">
+          <Loader2
+            className="animate-spin"
+            size={'200px'}
+            strokeWidth={'1px'}
+          />
+        </DialogContent>
+      </Dialog>
+      <div className="flex justify-between">
+        {!enableLoader && auth.isAuthenticated() && (
+          <Sidebar handleLogout={handleLogout} />
+        )}
 
-export { DefaultLayout };
+        <main className="w-full h-full">
+          {!enableLoader && auth.isAuthenticated() && <Header />}
+
+          {children}
+        </main>
+      </div>
+    </ErrorBoundary>
+  );
+};
+
+export default DefaultLayout;

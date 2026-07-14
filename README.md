@@ -1,30 +1,74 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# File Manager
 
-Currently, two official plugins are available:
+## Overview
+A File manager with React Frontend and [Rails Backend](https://github.com/voidzenn/file_manager). Allows users to manage their files and folders seamlessly. The app uses Minio for object storage, ensuring that the structure in the File Manager UI mirrors the structure in Minio, providing a reliable and intuitive user experience. Additionally, the app features real-time updates with ActionCable, allowing users to see changes immediately as they happen.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- **Folder Management:**
+  - Create Folder
+  - Create Nested Folder
+  - Rename Folder
+  - Remove Folder
+  - Get Folder List
 
-## Expanding the ESLint configuration
+- **File Management:**
+  - Create File
+  - Create File inside a Folder
+  - Rename File
+  - Remove File
+  - View File
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Technology Stack
+- **React 18**: Framework
+- **Zustand**: State management library
+- **Shadcn**: Component library
+- **ActionCable**: Real-time updates
+- **Zod**: Schema validation
 
-- Configure the top-level `parserOptions` property like this:
+## Preview
+### Demo
+[Watch Video](https://drive.google.com/file/d/1sCuIr0_DZvcVsbu38O85gBYM-0qf9P_9/view?usp=sharing)
+### Screenshots
+![Screenshot from 2024-08-06 00-44-11](https://github.com/user-attachments/assets/354ecbc3-c895-49c3-b5f4-0139bd782bc3)
+![Screenshot from 2024-08-06 00-43-59](https://github.com/user-attachments/assets/eebcab22-932a-4934-ba8a-113bb9c2dc02)
+![Screenshot from 2024-08-05 17-49-49](https://github.com/user-attachments/assets/526ace27-cc08-4037-b754-dc5dfb15a803)
+![Screenshot from 2024-08-05 17-50-25](https://github.com/user-attachments/assets/327fe08a-13ce-4d5c-9bf5-076900658301)
+![Screenshot from 2024-08-05 17-50-28](https://github.com/user-attachments/assets/4ebdb208-39af-402c-9f79-4add5a83d14f)
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+## Backend API Documentation
+- When accessing BE documentation you need follow the [steps](https://github.com/voidzenn/file_manager?tab=readme-ov-file#setup)
+![Screenshot from 2024-08-05 17-48-37](https://github.com/user-attachments/assets/0cf0fd63-f738-4b64-a5ea-d890b878b707)
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Setup
+
+### Prerequisites
+Dependencies installed on your machine
+- Node.js version 14.0.0 or higher
+- Npm or Yarn
+### Installation Steps
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/voidzenn/file_manager_fe.git
+   cd <repository-name>
+   ```
+
+2. **Rename .env.example to .env:**
+   ```bash
+   mv .env.example .env
+   ```
+3. **Install dependencies:**
+   ```bash
+   npm install
+   # or 
+   yarn install
+   ```
+
+4. **Run the app:**
+   ```bash
+   yarn dev
+   ```
+
+5. **Access the web application:**
+
+   Open your browser and navigate to [http://localhost:3001](http://localhost:3001)
